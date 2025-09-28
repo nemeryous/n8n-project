@@ -8,8 +8,10 @@ import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 @Data
+@NoArgsConstructor
 @AllArgsConstructor
 @Entity
 @Table(name = "products")
@@ -31,7 +33,10 @@ public class Product {
   @Column(name = "image_url")
   private String imageUrl;
 
-  @Column(name = "stock")
-  private Integer stock;
+  @Column(name = "stock_quantity")
+  private Integer stockQuantity;
+
+  @Column(name = "category")
+  private String category;
 
 }
