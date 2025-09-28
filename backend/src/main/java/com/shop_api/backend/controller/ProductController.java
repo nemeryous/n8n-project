@@ -7,6 +7,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import com.shop_api.backend.common.PageResponse;
 import com.shop_api.backend.dto.CreateProductDto;
 import com.shop_api.backend.dto.ProductDto;
 import com.shop_api.backend.dto.UpdateProductDto;
@@ -20,8 +21,14 @@ public class ProductController {
   private ProductService productService;
 
   @GetMapping
-  public ResponseEntity<List<ProductDto>> getAllProducts() {
-    List<ProductDto> products = productService.getAllProducts();
+  public ResponseEntity<PageResponse<ProductDto>> getAllProducts(
+    @RequestParam(defaultValue = "0") int page,
+    @RequestParam(defaultValue = "10") int size,
+    @RequestParam(defaultValue = "id") String sortBy, 
+    @RequestParam(defaultValue = "asc") String sortDir,
+    @RequestParam(required = false) String search
+  ) {
+    PageResponse<ProductDto> products = productService.getAllProducts(page, size, sortBy, sortDir, search);
     return ResponseEntity.ok(products);
   }
 
@@ -51,15 +58,4 @@ public class ProductController {
         : ResponseEntity.notFound().build();
   }
 
-  @GetMapping("/search")
-  public ResponseEntity<List<ProductDto>> searchProductsByName(@RequestParam String name) {
-    List<ProductDto> products = productService.searchProductsByName(name);
-    return ResponseEntity.ok(products);
-  }
-
-  @GetMapping("/category/{category}")
-  public ResponseEntity<List<ProductDto>> getProductsByCategory(@PathVariable String category) {
-    List<ProductDto> products = productService.getProductsByCategory(category);
-    return ResponseEntity.ok(products);
-  }
 }

@@ -1,16 +1,19 @@
 package com.shop_api.backend.service.product;
 
-import java.util.List;
-
-
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
+import com.shop_api.backend.common.PageResponse;
 import com.shop_api.backend.dto.CreateProductDto;
 import com.shop_api.backend.dto.ProductDto;
 import com.shop_api.backend.dto.UpdateProductDto;
 import com.shop_api.backend.entity.Product;
 import com.shop_api.backend.repository.ProductRepository;
+import com.shop_api.backend.specification.ProductSpecification;
 
 @Service
 public class ProductServiceImpl implements ProductService {
@@ -19,8 +22,12 @@ public class ProductServiceImpl implements ProductService {
   private ProductRepository productRepository;
 
   @Override
-  public List<ProductDto> getAllProducts() {
-    return ProductDto.fromEntities(productRepository.findAll());
+  public PageResponse<ProductDto> getAllProducts(int page, int size, String sortBy, String sortDir, String search) {
+    Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.fromString(sortDir), sortBy));
+
+    Specification<Product> spec = Specification.where(ProductSpecification.searchByKeyword(search));
+
+    return new PageResponse<>(productRepository.findAll(spec, pageable).map(ProductDto::fromEntity));
   }
 
   @Override
@@ -62,16 +69,6 @@ public class ProductServiceImpl implements ProductService {
     }
 
     return false;
-  }
-
-  @Override
-  public List<ProductDto> searchProductsByName(String name) {
-    return ProductDto.fromEntities(productRepository.findByNameContainingIgnoreCase(name));
-  }
-
-  @Override
-  public List<ProductDto> getProductsByCategory(String category) {
-    return ProductDto.fromEntities(productRepository.findByCategoryIgnoreCase(category));
   }
 
 }
