@@ -7,8 +7,6 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.shop_api.backend.constant.CartStatus;
 import com.shop_api.backend.entity.Cart;
 
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
 import lombok.Data;
 
 @Data
@@ -26,7 +24,6 @@ public class CartDto {
   @JsonProperty("updated_at")
   private Instant updatedAt;
 
-  @Enumerated(EnumType.STRING)
   @JsonProperty("status")
   private CartStatus status;
 
