@@ -27,15 +27,13 @@ public class CreateProductDto {
   private String imageUrl;
 
   public static Product toEntity(CreateProductDto dto) {
-    return new Product() {
-      {
-        setName(dto.getName());
-        setDescription(dto.getDescription());
-        setPrice(dto.getPrice());
-        setStockQuantity(dto.getStockQuantity());
-        setCategory(dto.getCategory());
-        setImageUrl(dto.getImageUrl());
-      }
-    };
+    Product product = new Product();
+    product.setName(dto.getName());
+    product.setDescription(dto.getDescription());
+    product.setPrice(dto.getPrice());
+    product.setStockQuantity(dto.getStockQuantity());
+    product.setCategory(dto.getCategory());
+    product.setImageUrl(dto.getImageUrl());
+    return product;
   }
 }

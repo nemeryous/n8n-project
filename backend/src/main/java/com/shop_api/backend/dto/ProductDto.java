@@ -33,31 +33,29 @@ public class ProductDto {
 
   public static ProductDto fromEntity(Product product) {
 
-    return new ProductDto() {
-      {
-        setId(product.getId());
-        setName(product.getName());
-        setDescription(product.getDescription());
-        setPrice(product.getPrice());
-        setStockQuantity(product.getStockQuantity());
-        setCategory(product.getCategory());
-        setImageUrl(product.getImageUrl());
-      }
-    };
+    ProductDto dto = new ProductDto();
+    dto.setId(product.getId());
+    dto.setName(product.getName());
+    dto.setDescription(product.getDescription());
+    dto.setPrice(product.getPrice());
+    dto.setStockQuantity(product.getStockQuantity());
+    dto.setCategory(product.getCategory());
+    dto.setImageUrl(product.getImageUrl());
+
+    return dto;
+
   }
 
   public static Product toEntity(ProductDto dto) {
-    return new Product() {
-      {
-        setId(dto.getId());
-        setName(dto.getName());
-        setDescription(dto.getDescription());
-        setPrice(dto.getPrice());
-        setStockQuantity(dto.getStockQuantity());
-        setCategory(dto.getCategory());
-        setImageUrl(dto.getImageUrl());
-      }
-    };
+    Product product = new Product();
+    product.setId(dto.getId());
+    product.setName(dto.getName());
+    product.setDescription(dto.getDescription());
+    product.setPrice(dto.getPrice());
+    product.setStockQuantity(dto.getStockQuantity());
+    product.setCategory(dto.getCategory());
+    product.setImageUrl(dto.getImageUrl());
+    return product;
   }
 
   public static List<ProductDto> fromEntities(List<Product> products) {
