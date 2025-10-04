@@ -1,7 +1,5 @@
 package com.shop_api.backend.controller;
 
-import java.util.List;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -22,12 +20,11 @@ public class ProductController {
 
   @GetMapping
   public ResponseEntity<PageResponse<ProductDto>> getAllProducts(
-    @RequestParam(defaultValue = "0") int page,
-    @RequestParam(defaultValue = "10") int size,
-    @RequestParam(defaultValue = "id") String sortBy, 
-    @RequestParam(defaultValue = "asc") String sortDir,
-    @RequestParam(required = false) String search
-  ) {
+      @RequestParam(defaultValue = "0") int page,
+      @RequestParam(defaultValue = "10") int size,
+      @RequestParam(defaultValue = "id") String sortBy,
+      @RequestParam(defaultValue = "asc") String sortDir,
+      @RequestParam(required = false) String search) {
     PageResponse<ProductDto> products = productService.getAllProducts(page, size, sortBy, sortDir, search);
     return ResponseEntity.ok(products);
   }
