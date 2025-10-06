@@ -100,7 +100,6 @@ public class CartServiceImpl implements CartService {
       cart = new Cart();
       cart.setSessionId(sessionId);
       cart.setStatus(CartStatus.ACTIVE);
-      cart.setDeviceType("web"); // default
       cart.setCreatedAt(Instant.now());
       cart.setUpdatedAt(Instant.now());
       cart = cartRepository.save(cart);
@@ -120,7 +119,6 @@ public class CartServiceImpl implements CartService {
       cart = new Cart();
       cart.setCustomerId(customerId);
       cart.setStatus(CartStatus.ACTIVE);
-      cart.setDeviceType("web"); // default
       cart.setCreatedAt(Instant.now());
       cart.setUpdatedAt(Instant.now());
       cart = cartRepository.save(cart);
