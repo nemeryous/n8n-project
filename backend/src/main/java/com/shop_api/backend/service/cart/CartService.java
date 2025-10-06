@@ -20,4 +20,9 @@ public interface CartService {
   List<CartDto> getCartsByCustomerId(Integer customerId);
   
   CartDto getActiveCartByCustomerId(Integer customerId);
+  
+  // Session-based cart methods
+  CartDto getOrCreateCartBySession(String sessionId);
+  
+  CartDto getOrCreateCartByCustomer(Integer customerId);
 }

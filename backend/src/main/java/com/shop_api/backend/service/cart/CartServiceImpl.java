@@ -89,4 +89,44 @@ public class CartServiceImpl implements CartService {
     return CartDto.fromEntity(cart);
   }
 
+  @Override
+  public CartDto getOrCreateCartBySession(String sessionId) {
+    // Try to find existing active cart by session
+    Cart cart = cartRepository.findBySessionIdAndStatus(sessionId, CartStatus.ACTIVE)
+        .orElse(null);
+    
+    if (cart == null) {
+      // Create new cart for session
+      cart = new Cart();
+      cart.setSessionId(sessionId);
+      cart.setStatus(CartStatus.ACTIVE);
+      cart.setDeviceType("web"); // default
+      cart.setCreatedAt(Instant.now());
+      cart.setUpdatedAt(Instant.now());
+      cart = cartRepository.save(cart);
+    }
+    
+    return CartDto.fromEntity(cart);
+  }
+
+  @Override
+  public CartDto getOrCreateCartByCustomer(Integer customerId) {
+    // Try to find existing active cart by customer
+    Cart cart = cartRepository.findByCustomerIdAndStatus(customerId, CartStatus.ACTIVE)
+        .orElse(null);
+    
+    if (cart == null) {
+      // Create new cart for customer
+      cart = new Cart();
+      cart.setCustomerId(customerId);
+      cart.setStatus(CartStatus.ACTIVE);
+      cart.setDeviceType("web"); // default
+      cart.setCreatedAt(Instant.now());
+      cart.setUpdatedAt(Instant.now());
+      cart = cartRepository.save(cart);
+    }
+    
+    return CartDto.fromEntity(cart);
+  }
+
 }

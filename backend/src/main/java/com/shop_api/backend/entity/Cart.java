@@ -26,6 +26,12 @@ public class Cart {
   @Column(name = "customer_id")
   private Integer customerId;
 
+  @Column(name = "session_id")
+  private String sessionId;
+
+  @Column(name = "device_type")
+  private String deviceType;
+
   @Column(name = "created_at")
   private Instant createdAt;
 

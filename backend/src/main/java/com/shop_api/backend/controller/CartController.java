@@ -68,4 +68,22 @@ public class CartController {
     CartDto activeCart = cartService.getActiveCartByCustomerId(customerId);
     return ResponseEntity.ok(activeCart);
   }
+
+  /**
+   * Get or create cart by session ID (for guest users)
+   */
+  @GetMapping("/session/{sessionId}")
+  public ResponseEntity<CartDto> getCartBySession(@PathVariable String sessionId) {
+    CartDto cart = cartService.getOrCreateCartBySession(sessionId);
+    return ResponseEntity.ok(cart);
+  }
+
+  /**
+   * Get or create cart by customer ID (for logged-in users)
+   */
+  @GetMapping("/customer/{customerId}/current")
+  public ResponseEntity<CartDto> getCurrentCart(@PathVariable Integer customerId) {
+    CartDto cart = cartService.getOrCreateCartByCustomer(customerId);
+    return ResponseEntity.ok(cart);
+  }
 }
