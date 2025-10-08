@@ -6,15 +6,24 @@ import org.springframework.stereotype.Service;
 import com.shop_api.backend.dto.CartItemDto;
 import com.shop_api.backend.dto.CartItemRequestDto;
 import com.shop_api.backend.entity.CartItem;
+import com.shop_api.backend.entity.Product;
 import com.shop_api.backend.repository.CartItemRepository;
+import com.shop_api.backend.repository.ProductRepository;
+
+import lombok.extern.slf4j.Slf4j;
 
 import java.util.List;
+import java.util.Map;
 
 @Service
+@Slf4j
 public class CartItemServiceImpl implements CartItemService {
 
   @Autowired
   private CartItemRepository cartItemRepository;
+
+  @Autowired
+  private ProductRepository productRepository;
 
   @Override
   public CartItemDto createCartItem(CartItemRequestDto cartItemRequestDto) {
@@ -22,6 +31,15 @@ public class CartItemServiceImpl implements CartItemService {
     cartItem.setProductId(cartItemRequestDto.getProductId());
     cartItem.setCustomerId(cartItemRequestDto.getCustomerId());
     cartItem.setQuantity(cartItemRequestDto.getQuantity());
+    cartItem.setCartId(cartItemRequestDto.getCartId());
+
+    Product product = productRepository.findById(cartItemRequestDto.getProductId())
+        .orElseThrow(() -> new RuntimeException("Product not found with id: " + cartItemRequestDto.getProductId()));
+
+    log.info("Need to check quantity in stock");
+
+    cartItem.setUnitPrice(product.getPrice());
+    cartItem.setTotalPrice(product.getPrice() * cartItemRequestDto.getQuantity());
 
     CartItem savedCartItem = cartItemRepository.save(cartItem);
     return CartItemDto.fromEntity(savedCartItem);
@@ -37,19 +55,20 @@ public class CartItemServiceImpl implements CartItemService {
   @Override
   public List<CartItemDto> getAllCartItems() {
     List<CartItem> cartItems = cartItemRepository.findAll();
-    return CartItemDto.fromEntities(cartItems);
+
+    return CartItemDto.fromEntities(cartItems, getProductNamesMap(cartItems));
   }
 
   @Override
   public List<CartItemDto> getCartItemsByCustomerId(Integer customerId) {
     List<CartItem> cartItems = cartItemRepository.findByCustomerId(customerId);
-    return CartItemDto.fromEntities(cartItems);
+    return CartItemDto.fromEntities(cartItems, getProductNamesMap(cartItems));
   }
 
   @Override
   public List<CartItemDto> getCartItemsByProductId(Integer productId) {
     List<CartItem> cartItems = cartItemRepository.findByProductId(productId);
-    return CartItemDto.fromEntities(cartItems);
+    return CartItemDto.fromEntities(cartItems, getProductNamesMap(cartItems));
   }
 
   @Override
@@ -70,6 +89,18 @@ public class CartItemServiceImpl implements CartItemService {
     CartItem cartItem = cartItemRepository.findById(id)
         .orElseThrow(() -> new RuntimeException("CartItem not found with id: " + id));
     cartItemRepository.delete(cartItem);
+  }
+
+  private Map<Integer, String> getProductNamesMap(List<CartItem> cartItems) {
+    List<Integer> productIds = cartItems.stream()
+        .map(CartItem::getProductId)
+        .distinct()
+        .toList();
+
+    List<Product> products = productRepository.findAllById(productIds);
+
+    return products.stream().collect(
+        java.util.stream.Collectors.toMap(Product::getId, Product::getName));
   }
 
 }

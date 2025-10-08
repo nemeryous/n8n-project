@@ -4,12 +4,13 @@ import java.util.List;
 
 import com.shop_api.backend.dto.CartDto;
 import com.shop_api.backend.dto.CartRequestDto;
+import com.shop_api.backend.dto.CartResponseDto;
 
 public interface CartService {
   
   List<CartDto> getAllCarts();
   
-  CartDto getCartById(Integer id);
+  CartResponseDto getCartById(Integer id);
   
   CartDto createCart(CartRequestDto dto);
   
@@ -21,8 +22,9 @@ public interface CartService {
   
   CartDto getActiveCartByCustomerId(Integer customerId);
   
-  // Session-based cart methods
   CartDto getOrCreateCartBySession(String sessionId);
   
   CartDto getOrCreateCartByCustomer(Integer customerId);
+
+  CartDto abandonCart(Integer id);
 }

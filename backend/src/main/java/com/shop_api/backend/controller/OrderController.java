@@ -21,7 +21,7 @@ import com.shop_api.backend.dto.OrderItemDto;
 import com.shop_api.backend.dto.OrderStatusUpdateDto;
 import com.shop_api.backend.entity.Order;
 import com.shop_api.backend.entity.OrderItem;
-import com.shop_api.backend.service.OrderService;
+import com.shop_api.backend.service.order.OrderService;
 
 /**
  * Controller for order operations

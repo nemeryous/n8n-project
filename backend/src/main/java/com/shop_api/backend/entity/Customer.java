@@ -1,7 +1,11 @@
 package com.shop_api.backend.entity;
 
+import com.shop_api.backend.constant.CustomerSegment;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -30,4 +34,8 @@ public class Customer {
 
   @Column(name = "hash_password")
   private String hashPasswords;
+
+  @Enumerated(EnumType.STRING)
+  @Column(name = "customer_segment")
+  private CustomerSegment customerSegment;
 }

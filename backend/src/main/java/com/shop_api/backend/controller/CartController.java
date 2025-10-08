@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.shop_api.backend.dto.CartDto;
 import com.shop_api.backend.dto.CartRequestDto;
+import com.shop_api.backend.dto.CartResponseDto;
 import com.shop_api.backend.service.cart.CartService;
 
 @RestController
@@ -32,8 +33,8 @@ public class CartController {
   }
 
   @GetMapping("/{id}")
-  public ResponseEntity<CartDto> getCartById(@PathVariable Integer id) {
-    CartDto cart = cartService.getCartById(id);
+  public ResponseEntity<CartResponseDto> getCartById(@PathVariable Integer id) {
+    CartResponseDto cart = cartService.getCartById(id);
     return ResponseEntity.ok(cart);
   }
 
@@ -47,6 +48,12 @@ public class CartController {
   public ResponseEntity<CartDto> updateCart(@PathVariable Integer id,
       @RequestBody CartRequestDto dto) {
     CartDto updatedCart = cartService.updateCart(id, dto);
+    return ResponseEntity.ok(updatedCart);
+  }
+
+  @PutMapping("/abandoned/{id}")
+  public ResponseEntity<CartDto> abandonedCart(@PathVariable Integer id) {
+    CartDto updatedCart = cartService.abandonCart(id);
     return ResponseEntity.ok(updatedCart);
   }
 

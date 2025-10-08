@@ -22,9 +22,6 @@ public class CartItem {
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   private Integer id;
 
-  /**
-   * Reference to cart - using ID only (no ORM mapping)
-   */
   @Column(name = "cart_id", nullable = false)
   private Integer cartId;
 
@@ -37,15 +34,10 @@ public class CartItem {
   @Column(name = "quantity")
   private Integer quantity;
 
-  /**
-   * Unit price snapshot at the time of adding to cart
-   */
-  @Column(name = "unit_price", precision = 10, scale = 2)
-  private BigDecimal unitPrice;
+  @Column(name = "unit_price")
+  private Double unitPrice;
 
-  /**
-   * Total price for this item (quantity * unit_price)
-   */
-  @Column(name = "total_price", precision = 10, scale = 2)
-  private BigDecimal totalPrice;
+  @Column(name = "total_price")
+  private Double totalPrice;
+
 }

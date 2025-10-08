@@ -15,4 +15,7 @@ public class CartItemRequestDto {
 
   @JsonProperty("quantity")
   private Integer quantity;
+
+  @JsonProperty("cart_id")
+  private Integer cartId;
 }

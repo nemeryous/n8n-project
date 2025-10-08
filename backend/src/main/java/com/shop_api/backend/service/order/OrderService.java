@@ -1,4 +1,4 @@
-package com.shop_api.backend.service;
+package com.shop_api.backend.service.order;
 
 import java.util.List;
 

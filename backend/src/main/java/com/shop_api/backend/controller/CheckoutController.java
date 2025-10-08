@@ -21,11 +21,9 @@ import com.shop_api.backend.dto.OrderItemDto;
 import com.shop_api.backend.dto.OrderStatusUpdateDto;
 import com.shop_api.backend.entity.Order;
 import com.shop_api.backend.entity.OrderItem;
-import com.shop_api.backend.service.CheckoutService;
+import com.shop_api.backend.service.order.CheckoutService;
 
-/**
- * Controller for checkout operations and n8n workflow automation
- */
+
 @RestController
 @RequestMapping("${api.prefix}/checkout")
 public class CheckoutController {
