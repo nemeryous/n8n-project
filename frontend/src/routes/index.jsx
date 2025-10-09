@@ -9,6 +9,8 @@ import ProductDetailPage from "../pages/ProductDetailPage";
 import AboutMePage from "../pages/AboutMePage";
 import LoginPage from "../pages/LoginPage";
 import RegisterPage from "../pages/RegisterPage";
+import ProductAdminPage from "../pages/ProductAdminPage";
+import OrderAdminPage from "../pages/OrderAdminPage";
 
 const router = createBrowserRouter([
   {
@@ -30,6 +32,14 @@ const router = createBrowserRouter([
       {
         path: "/admin",
         element: <AdminPage />,
+      },
+      {
+        path: "/admin/products",
+        element: <ProductAdminPage />,
+      },
+      {
+        path: "/admin/orders",
+        element: <OrderAdminPage />,
       },
       {
         path: "/products",

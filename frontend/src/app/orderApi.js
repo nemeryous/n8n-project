@@ -5,7 +5,7 @@ const BASE_URL = import.meta.env.VITE_BASE_URL;
 export const orderApi = createApi({
   reducerPath: "orderApi",
   baseQuery: fetchBaseQuery({ baseUrl: BASE_URL }),
-  tagTypes: ["Order"],
+  tagTypes: ["Orders"],
   endpoints: (builder) => ({
     createOrder: builder.mutation({
       query: (newOrder) => ({
@@ -13,11 +13,42 @@ export const orderApi = createApi({
         method: "POST",
         body: newOrder,
       }),
-      // After creating an order, we might want to invalidate cart-related tags
-      // to refetch cart data and show it as empty.
       invalidatesTags: ["Cart", "CartItem"],
+    }),
+    getOrders: builder.query({
+      query: (status) => ({
+        url: "/orders",
+        params: status ? { status } : {},
+      }),
+      providesTags: ["Orders"],
+    }),
+    getOrderById: builder.query({
+      query: (orderId) => `/orders/${orderId}`,
+      providesTags: (result, error, orderId) => [
+        { type: "Orders", id: orderId },
+      ],
+    }),
+    getOrderItems: builder.query({
+      query: (orderId) => `/orders/${orderId}/items`,
+    }),
+    updateOrderStatus: builder.mutation({
+      query: ({ orderId, status }) => ({
+        url: `/orders/${orderId}/status`,
+        method: "PUT",
+        body: { status },
+      }),
+      invalidatesTags: (result, error, { orderId }) => [
+        "Orders",
+        { type: "Orders", id: orderId },
+      ],
     }),
   }),
 });
 
-export const { useCreateOrderMutation } = orderApi;
+export const {
+  useCreateOrderMutation,
+  useGetOrdersQuery,
+  useGetOrderByIdQuery,
+  useGetOrderItemsQuery,
+  useUpdateOrderStatusMutation,
+} = orderApi;
