@@ -46,7 +46,7 @@ const ProductCard = ({ product, onAddToCart }) => {
       {/* Image Container */}
       <div className="relative h-72 overflow-hidden bg-gray-100">
         <motion.img
-          src={product.image}
+          src={product.image_url}
           alt={product.name}
           animate={{ scale: isHovered ? 1.1 : 1 }}
           transition={{ duration: 0.4 }}
@@ -102,20 +102,9 @@ const ProductCard = ({ product, onAddToCart }) => {
           {product.name}
         </h3>
 
-        <div className="flex items-center mb-3">
-          <div className="flex text-yellow-400 mr-2">
-            {[...Array(5)].map((_, i) => (
-              <FontAwesomeIcon
-                key={i}
-                icon={faStar}
-                className={`text-sm ${
-                  i < Math.floor(product.rating) ? "opacity-100" : "opacity-30"
-                }`}
-              />
-            ))}
-          </div>
+        <div className="flex items-center mb-3 h-5">
           <span className="text-sm text-gray-600">
-            {product.rating} ({product.sold} đã bán)
+            Số lượng: {product.stock_quantity}
           </span>
         </div>
 

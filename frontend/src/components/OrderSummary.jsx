@@ -8,10 +8,12 @@ import {
 
 const OrderSummary = ({ cartItems, shippingFee }) => {
   const subtotal = cartItems.reduce(
-    (sum, item) => sum + item.price * item.quantity,
+    (sum, item) => (item ? sum + item.unit_price * item.quantity : sum),
     0
   );
   const total = subtotal + shippingFee;
+
+  const validItemsCount = cartItems.filter((item) => item).length;
 
   return (
     <motion.div
@@ -29,7 +31,7 @@ const OrderSummary = ({ cartItems, shippingFee }) => {
 
       <div className="space-y-4 mb-6">
         <div className="flex justify-between text-gray-600">
-          <span>Tạm tính ({cartItems.length} sản phẩm)</span>
+          <span>Tạm tính ({validItemsCount} sản phẩm)</span>
           <span className="font-semibold">
             {subtotal.toLocaleString("vi-VN")}đ
           </span>

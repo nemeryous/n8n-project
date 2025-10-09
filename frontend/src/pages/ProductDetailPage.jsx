@@ -3,51 +3,87 @@ import { useParams, Link } from "react-router-dom";
 import { motion } from "framer-motion";
 import Header from "../components/layout/Header";
 import Footer from "../components/layout/Footer";
+import ProductReview from "../components/ProductReview";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
-  faShoppingCart,
-  faStar,
   faArrowLeft,
-  faCheckCircle,
+  faExclamationTriangle,
   faShieldAlt,
+  faShoppingCart,
+  faSpinner,
 } from "@fortawesome/free-solid-svg-icons";
-
-// Mock data - In production, this would be fetched from an API
-const mockProducts = [
-  {
-    id: 1,
-    name: "Áo Thun Premium Cotton",
-    price: 250000,
-    image:
-      "https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?w=800&h=800&fit=crop",
-    rating: 4.5,
-    sold: 1200,
-    description:
-      "Chất liệu 100% cotton cao cấp, thoáng mát, thấm hút mồ hôi tốt. Form áo regular fit, phù hợp với mọi vóc dáng. Đây là item không thể thiếu trong tủ đồ của bạn.",
-    sizes: ["S", "M", "L", "XL"],
-    colors: ["Trắng", "Đen", "Xanh Navy"],
-  },
-  // ... add other products here if needed
-];
+import { useGetProductByIdQuery } from "../app/productApi";
+import { useCreateCartItemMutation } from "../app/cartItemApi";
+import { useGetOrCreateCartByCustomerQuery } from "../app/cartApi";
 
 const ProductDetailPage = () => {
   const { id } = useParams();
-  const product = mockProducts.find((p) => p.id === parseInt(id));
-  const [cartCount, setCartCount] = useState(0);
+  const { data: product, error, isLoading } = useGetProductByIdQuery(id);
+  const [createCartItem] = useCreateCartItemMutation();
   const [selectedSize, setSelectedSize] = useState(null);
   const [selectedColor, setSelectedColor] = useState(null);
+  const customerId = 1; // Giả sử, sẽ lấy từ state auth
+  const { data: cart } = useGetOrCreateCartByCustomerQuery(customerId);
 
-  const handleAddToCart = () => {
-    setCartCount(cartCount + 1);
+  const handleAddToCart = async () => {
+    if (!cart || !product) {
+      console.error("Cart or Product not available yet.");
+      return;
+    }
+    try {
+      await createCartItem({
+        product_id: product.id,
+        customer_id: customerId,
+        quantity: 1,
+      }).unwrap();
+    } catch (err) {
+      console.error("Failed to add item to cart: ", err);
+    }
   };
 
+  if (isLoading) {
+    return (
+      <div className="min-h-screen bg-white flex items-center justify-center">
+        <div className="text-center text-gray-500">
+          <FontAwesomeIcon icon={faSpinner} spin size="3x" />
+          <p className="mt-4 text-lg">Đang tải chi tiết sản phẩm...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="min-h-screen bg-white flex items-center justify-center">
+        <div className="text-center text-red-500">
+          <FontAwesomeIcon icon={faExclamationTriangle} size="3x" />
+          <p className="mt-4 text-lg">
+            Không thể tải thông tin sản phẩm. Vui lòng thử lại.
+          </p>
+        </div>
+      </div>
+    );
+  }
+
   if (!product) {
-    return <div>Sản phẩm không tồn tại</div>;
+    return (
+      <div className="min-h-screen bg-white flex items-center justify-center">
+        <div className="text-center text-gray-500">
+          <h1 className="text-2xl">Sản phẩm không tồn tại</h1>
+          <Link
+            to="/products"
+            className="text-indigo-600 hover:underline mt-4 inline-block"
+          >
+            Quay lại trang sản phẩm
+          </Link>
+        </div>
+      </div>
+    );
   }
 
   return (
     <div className="min-h-screen bg-white">
-      <Header cartCount={cartCount} />
+      <Header />
 
       <main className="container mx-auto px-4 py-12">
         <Link to="/products">
@@ -68,7 +104,7 @@ const ProductDetailPage = () => {
             className="w-full h-full"
           >
             <img
-              src={product.image}
+              src={product.image_url || "https://via.placeholder.com/800x800"}
               alt={product.name}
               className="w-full h-auto object-cover rounded-2xl shadow-2xl"
             />
@@ -84,21 +120,8 @@ const ProductDetailPage = () => {
             </h1>
 
             <div className="flex items-center mb-4">
-              <div className="flex text-yellow-400 mr-2">
-                {[...Array(5)].map((_, i) => (
-                  <FontAwesomeIcon
-                    key={i}
-                    icon={faStar}
-                    className={`text-xl ${
-                      i < Math.floor(product.rating)
-                        ? "opacity-100"
-                        : "opacity-30"
-                    }`}
-                  />
-                ))}
-              </div>
               <span className="text-lg text-gray-600">
-                {product.rating} ({product.sold} đã bán)
+                Số lượng còn lại: {product.stock_quantity}
               </span>
             </div>
 
@@ -111,46 +134,50 @@ const ProductDetailPage = () => {
             </p>
 
             {/* Sizes */}
-            <div className="mb-6">
-              <h3 className="font-semibold text-gray-800 mb-2">Kích cỡ:</h3>
-              <div className="flex space-x-2">
-                {product.sizes.map((size) => (
-                  <motion.button
-                    key={size}
-                    whileHover={{ scale: 1.05 }}
-                    onClick={() => setSelectedSize(size)}
-                    className={`px-4 py-2 rounded-lg border-2 font-medium transition-colors ${
-                      selectedSize === size
-                        ? "bg-indigo-600 text-white border-indigo-600"
-                        : "bg-white text-gray-700 border-gray-300 hover:border-indigo-500"
-                    }`}
-                  >
-                    {size}
-                  </motion.button>
-                ))}
+            {product.sizes && product.sizes.length > 0 && (
+              <div className="mb-6">
+                <h3 className="font-semibold text-gray-800 mb-2">Kích cỡ:</h3>
+                <div className="flex space-x-2">
+                  {product.sizes.map((size) => (
+                    <motion.button
+                      key={size}
+                      whileHover={{ scale: 1.05 }}
+                      onClick={() => setSelectedSize(size)}
+                      className={`px-4 py-2 rounded-lg border-2 font-medium transition-colors ${
+                        selectedSize === size
+                          ? "bg-indigo-600 text-white border-indigo-600"
+                          : "bg-white text-gray-700 border-gray-300 hover:border-indigo-500"
+                      }`}
+                    >
+                      {size}
+                    </motion.button>
+                  ))}
+                </div>
               </div>
-            </div>
+            )}
 
             {/* Colors */}
-            <div className="mb-8">
-              <h3 className="font-semibold text-gray-800 mb-2">Màu sắc:</h3>
-              <div className="flex space-x-2">
-                {product.colors.map((color) => (
-                  <motion.button
-                    key={color}
-                    whileHover={{ scale: 1.05 }}
-                    onClick={() => setSelectedColor(color)}
-                    className={`px-4 py-2 rounded-lg border-2 font-medium transition-colors ${
-                      selectedColor === color
-                        ? "bg-indigo-600 text-white border-indigo-600"
-                        : "bg-white text-gray-700 border-gray-300 hover:border-indigo-500"
-                    }`}
-                  >
-                    {color}
-                  </motion.button>
-                ))}
+            {product.colors && product.colors.length > 0 && (
+              <div className="mb-8">
+                <h3 className="font-semibold text-gray-800 mb-2">Màu sắc:</h3>
+                <div className="flex space-x-2">
+                  {product.colors.map((color) => (
+                    <motion.button
+                      key={color}
+                      whileHover={{ scale: 1.05 }}
+                      onClick={() => setSelectedColor(color)}
+                      className={`px-4 py-2 rounded-lg border-2 font-medium transition-colors ${
+                        selectedColor === color
+                          ? "bg-indigo-600 text-white border-indigo-600"
+                          : "bg-white text-gray-700 border-gray-300 hover:border-indigo-500"
+                      }`}
+                    >
+                      {color}
+                    </motion.button>
+                  ))}
+                </div>
               </div>
-            </div>
+            )}
 
             <motion.button
               whileHover={{ scale: 1.02 }}
@@ -174,6 +201,8 @@ const ProductDetailPage = () => {
             </div>
           </motion.div>
         </div>
+
+        <ProductReview />
       </main>
 
       <Footer />

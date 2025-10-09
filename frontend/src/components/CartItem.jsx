@@ -6,6 +6,22 @@ import { faMinus, faPlus, faTrash } from "@fortawesome/free-solid-svg-icons";
 const CartItem = ({ item, onUpdateQuantity, onRemove }) => {
   const [isRemoving, setIsRemoving] = useState(false);
 
+  // Defensive check for item and product
+  if (!item) {
+    // Render a placeholder or loader if product data is not yet available
+    return (
+      <div className="bg-white rounded-2xl p-4 shadow-md animate-pulse">
+        <div className="flex items-center space-x-4">
+          <div className="w-24 h-24 rounded-xl bg-gray-200"></div>
+          <div className="flex-1 space-y-2">
+            <div className="h-4 bg-gray-200 rounded w-3/4"></div>
+            <div className="h-6 bg-gray-200 rounded w-1/2"></div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   const handleRemove = () => {
     setIsRemoving(true);
     setTimeout(() => onRemove(item.id), 300);
@@ -28,18 +44,18 @@ const CartItem = ({ item, onUpdateQuantity, onRemove }) => {
           className="w-24 h-24 rounded-xl overflow-hidden flex-shrink-0 bg-gray-100"
         >
           <img
-            src={item.image}
-            alt={item.name}
+            src={item.image_url}
+            alt={item.product_name}
             className="w-full h-full object-cover"
           />
         </motion.div>
 
         <div className="flex-1 min-w-0">
           <h3 className="font-bold text-gray-800 text-lg mb-1 truncate">
-            {item.name}
+            {item.product_name}
           </h3>
           <p className="text-indigo-600 font-semibold text-xl">
-            {item.price.toLocaleString("vi-VN")}đ
+            {item.unit_price.toLocaleString("vi-VN")}đ
           </p>
         </div>
 

@@ -1,16 +1,28 @@
-import { motion } from "framer-motion";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faShoppingCart } from "@fortawesome/free-solid-svg-icons";
 import NavLink from "../ui/NavLink";
 import { Link } from "react-router-dom";
+import { motion } from "framer-motion";
 
-const Header = ({ cartCount }) => {
+import { useGetCartItemsByCustomerIdQuery } from "../../app/cartItemApi";
+import { useGetOrCreateCartByCustomerQuery } from "../../app/cartApi";
+
+const Header = () => {
+  const customerId = 1; // Giả sử, sẽ lấy từ state auth
+  const { data: cart } = useGetOrCreateCartByCustomerQuery(customerId);
+  const { data: cartItems, isLoading } = useGetCartItemsByCustomerIdQuery(
+    cart?.id,
+    {
+      skip: !cart, // Bỏ qua query này nếu chưa có cart
+    }
+  );
+
+  const cartCount = isLoading
+    ? 0
+    : cartItems?.reduce((total, item) => total + item.quantity, 0) || 0;
+
   return (
-    <motion.header
-      initial={{ y: -100 }}
-      animate={{ y: 0 }}
-      className="bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-600 text-white shadow-2xl sticky top-0 z-50"
-    >
+    <header className="bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-600 text-white shadow-2xl sticky top-0 z-50">
       <div className="container mx-auto px-4 py-4">
         <div className="flex items-center justify-between">
           <Link to="/">
@@ -30,6 +42,7 @@ const Header = ({ cartCount }) => {
             <NavLink to="/products">Sản phẩm</NavLink>
             <NavLink to="/about-me">Về chúng tôi</NavLink>
             <NavLink to="/admin">Admin</NavLink>
+            <NavLink to="/login">Đăng nhập</NavLink>
           </nav>
 
           <Link to="/checkout">
@@ -52,7 +65,7 @@ const Header = ({ cartCount }) => {
           </Link>
         </div>
       </div>
-    </motion.header>
+    </header>
   );
 };
 
