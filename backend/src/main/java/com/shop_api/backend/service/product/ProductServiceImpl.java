@@ -13,6 +13,7 @@ import com.shop_api.backend.dto.ProductDto;
 import com.shop_api.backend.dto.UpdateProductDto;
 import com.shop_api.backend.entity.Product;
 import com.shop_api.backend.repository.ProductRepository;
+import com.shop_api.backend.service.n8n.N8nWebHookService;
 import com.shop_api.backend.specification.ProductSpecification;
 
 @Service
@@ -20,6 +21,9 @@ public class ProductServiceImpl implements ProductService {
 
   @Autowired
   private ProductRepository productRepository;
+
+  @Autowired
+  private N8nWebHookService n8nWebHookService;
 
   @Override
   public PageResponse<ProductDto> getAllProducts(int page, int size, String sortBy, String sortDir, String search) {
@@ -41,6 +45,8 @@ public class ProductServiceImpl implements ProductService {
   public ProductDto createProduct(CreateProductDto dto) {
     Product product = CreateProductDto.toEntity(dto);
     Product savedProduct = productRepository.save(product);
+    n8nWebHookService.triggerCreateProductWebhook(ProductDto.fromEntity(savedProduct));
+
     return ProductDto.fromEntity(savedProduct);
   }
 

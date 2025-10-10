@@ -13,23 +13,26 @@ public class ProductDto {
   @JsonProperty("id")
   private Integer id;
 
-  @JsonProperty("name")
+  @JsonProperty("productName")
   private String name;
 
-  @JsonProperty("description")
+  @JsonProperty("productDescription")
   private String description;
 
   @JsonProperty("price")
   private Double price;
 
-  @JsonProperty("stock_quantity")
+  @JsonProperty("stock")
   private Integer stockQuantity;
 
   @JsonProperty("category")
   private String category;
 
-  @JsonProperty("image_url")
+  @JsonProperty("imageUrl")
   private String imageUrl;
+
+  @JsonProperty("currency")
+  private String currency;
 
   public static ProductDto fromEntity(Product product) {
 
@@ -41,6 +44,7 @@ public class ProductDto {
     dto.setStockQuantity(product.getStockQuantity());
     dto.setCategory(product.getCategory());
     dto.setImageUrl(product.getImageUrl());
+    dto.setCurrency(product.getCurrency());
 
     return dto;
 
@@ -55,6 +59,8 @@ public class ProductDto {
     product.setStockQuantity(dto.getStockQuantity());
     product.setCategory(dto.getCategory());
     product.setImageUrl(dto.getImageUrl());
+    product.setCurrency(dto.getCurrency());
+
     return product;
   }
 

@@ -8,23 +8,26 @@ import lombok.Data;
 @Data
 public class CreateProductDto {
 
-  @JsonProperty("name")
+  @JsonProperty("productName")
   private String name;
 
-  @JsonProperty("description")
+  @JsonProperty("productDescription")
   private String description;
 
   @JsonProperty("price")
   private Double price;
 
-  @JsonProperty("stock_quantity")
+  @JsonProperty("stock")
   private Integer stockQuantity;
 
   @JsonProperty("category")
   private String category;
 
-  @JsonProperty("image_url")
+  @JsonProperty("imageUrl")
   private String imageUrl;
+
+  @JsonProperty("currency")
+  private String currency;
 
   public static Product toEntity(CreateProductDto dto) {
     Product product = new Product();
@@ -34,6 +37,7 @@ public class CreateProductDto {
     product.setStockQuantity(dto.getStockQuantity());
     product.setCategory(dto.getCategory());
     product.setImageUrl(dto.getImageUrl());
+    product.setCurrency(dto.getCurrency());
     return product;
   }
 }
