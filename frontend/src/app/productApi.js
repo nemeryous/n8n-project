@@ -4,7 +4,13 @@ const BASE_URL = import.meta.env.VITE_BASE_URL;
 
 export const productApi = createApi({
   reducerPath: "productApi",
-  baseQuery: fetchBaseQuery({ baseUrl: BASE_URL }),
+  baseQuery: fetchBaseQuery({
+    baseUrl: BASE_URL,
+    prepareHeaders: (header) => {
+      header.set("ngrok-skip-browser-warning", "true");
+      return header;
+    },
+  }),
   tagTypes: ["Products"],
   endpoints: (builder) => ({
     getProducts: builder.query({

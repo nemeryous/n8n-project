@@ -40,6 +40,6 @@ public class Product {
   private String category;
 
   @Column(name = "currency")
-  private String currency;
+  private String currency = "USD";
 
 }
