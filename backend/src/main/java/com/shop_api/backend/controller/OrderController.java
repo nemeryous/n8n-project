@@ -44,9 +44,8 @@ public class OrderController {
           request.getCartId(),
           request.getShippingAddress(),
           request.getPhoneNumber(),
-          request.getNotes()
-      );
-      
+          request.getNotes());
+
       return ResponseEntity.status(HttpStatus.CREATED).body(OrderDto.fromEntity(order));
     } catch (RuntimeException e) {
       return ResponseEntity.badRequest().build();

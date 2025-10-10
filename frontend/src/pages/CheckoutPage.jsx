@@ -1,87 +1,124 @@
 import React, { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faShoppingCart, faArrowLeft } from "@fortawesome/free-solid-svg-icons";
+import {
+  faShoppingCart,
+  faArrowLeft,
+  faSpinner,
+  faExclamationTriangle,
+} from "@fortawesome/free-solid-svg-icons";
 import Header from "../components/layout/Header";
 import CartItem from "../components/CartItem";
 import OrderSummary from "../components/OrderSummary";
 import CheckoutForm from "../components/CheckoutForm";
 import { Link, useNavigate } from "react-router-dom";
-
-// Mock cart data - Trong production sẽ fetch từ RTK Query
-const mockCartItems = [
-  {
-    id: 1,
-    product_id: 1,
-    name: "Áo Thun Premium Cotton",
-    price: 250000,
-    quantity: 1,
-    image:
-      "https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?w=150&h=150&fit=crop",
-  },
-  {
-    id: 2,
-    product_id: 2,
-    name: "Quần Jean Slim Fit",
-    price: 450000,
-    quantity: 1,
-    image:
-      "https://images.unsplash.com/photo-1542272604-787c3835535d?w=150&h=150&fit=crop",
-  },
-];
+import {
+  useGetCartItemsByCustomerIdQuery,
+  useUpdateCartItemMutation,
+  useDeleteCartItemMutation,
+} from "../app/cartItemApi";
+import { useGetOrCreateCartByCustomerQuery } from "../app/cartApi";
+import { useCreateOrderMutation } from "../app/orderApi";
 
 const SHIPPING_FEE = 30000;
 
 export default function CheckoutPage() {
-  const [cartItems, setCartItems] = useState(mockCartItems);
-  const [isProcessing, setIsProcessing] = useState(false);
+  const customerId = 1; // Giả sử, sẽ lấy từ state auth
+  const { data: cart, isLoading: isCartLoading } =
+    useGetOrCreateCartByCustomerQuery(customerId);
+  const {
+    data: cartItems = [],
+    isLoading: areItemsLoading,
+    error: itemsError,
+  } = useGetCartItemsByCustomerIdQuery(customerId, {
+    skip: !cart,
+  });
+
+  const [updateCartItem] = useUpdateCartItemMutation();
+  const [deleteCartItem] = useDeleteCartItemMutation();
+  const [createOrder, { isLoading: isProcessing }] = useCreateOrderMutation();
+
   const navigate = useNavigate();
 
-  const handleUpdateQuantity = (itemId, newQuantity) => {
+  const handleUpdateQuantity = async (itemId, newQuantity) => {
     if (newQuantity < 1) return;
-
-    setCartItems(
-      cartItems.map((item) =>
-        item.id === itemId ? { ...item, quantity: newQuantity } : item
-      )
-    );
+    try {
+      await updateCartItem({ id: itemId, quantity: newQuantity });
+    } catch (error) {
+      console.error("Failed to update quantity:", error);
+    }
   };
 
-  const handleRemoveItem = (itemId) => {
-    setCartItems(cartItems.filter((item) => item.id !== itemId));
+  const handleRemoveItem = async (itemId) => {
+    try {
+      await deleteCartItem(itemId);
+    } catch (error) {
+      console.error("Failed to remove item:", error);
+    }
   };
 
   const handleCheckout = async (formData) => {
-    setIsProcessing(true);
+    if (!cart || !cartItems.length) return;
 
-    // In a real app, you would send this data to your backend
-    // For now, we'll just simulate a delay and navigate
-    await new Promise((resolve) => setTimeout(resolve, 2000));
-
-    const subtotal = cartItems.reduce(
-      (sum, item) => sum + item.price * item.quantity,
-      0
-    );
-    const total = subtotal + SHIPPING_FEE;
-
-    const finalOrderData = {
-      order_id: Math.random().toString(36).substr(2, 9).toUpperCase(),
-      total_amount: total,
-      customer_name: formData.name,
+    const orderPayload = {
+      customer_id: customerId,
+      cart_id: cart.id,
       shipping_address: formData.address,
-      customer_email: formData.email,
-      items: cartItems,
-      shippingFee: SHIPPING_FEE,
-      subtotal: subtotal,
+      phone_number: formData.phone,
+      notes: `Customer name: ${formData.name}`,
     };
 
-    setIsProcessing(false);
+    try {
+      const result = await createOrder(orderPayload).unwrap();
 
-    // Navigate to confirmation page
-    navigate("/confirmation", { state: { orderData: finalOrderData } });
+      const subtotal = cartItems.reduce(
+        (sum, item) => sum + item.product.price * item.quantity,
+        0
+      );
+      const total = subtotal + SHIPPING_FEE;
+
+      const finalOrderData = {
+        ...result,
+        total_amount: total,
+        customer_name: formData.name,
+        shipping_address: formData.address,
+        customer_email: formData.email,
+        items: cartItems.map((ci) => ({
+          ...ci.product,
+          quantity: ci.quantity,
+        })),
+        shippingFee: SHIPPING_FEE,
+        subtotal: subtotal,
+      };
+
+      navigate("/confirmation", { state: { orderData: finalOrderData } });
+    } catch (err) {
+      console.error("Failed to create order:", err);
+      // Optionally, show an error message to the user
+    }
   };
 
   const totalItems = cartItems.reduce((sum, item) => sum + item.quantity, 0);
+
+  if (isCartLoading || areItemsLoading) {
+    return (
+      <div className="flex justify-center items-center h-screen">
+        <FontAwesomeIcon icon={faSpinner} spin size="3x" />
+      </div>
+    );
+  }
+
+  if (itemsError) {
+    return (
+      <div className="text-center py-10">
+        <FontAwesomeIcon
+          icon={faExclamationTriangle}
+          className="text-red-500 text-4xl mb-4"
+        />
+        <p className="text-red-500">Error loading cart items.</p>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 to-indigo-50">

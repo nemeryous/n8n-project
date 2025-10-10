@@ -7,6 +7,10 @@ import AdminPage from "../pages/AdminPage";
 import ProductPage from "../pages/ProductPage";
 import ProductDetailPage from "../pages/ProductDetailPage";
 import AboutMePage from "../pages/AboutMePage";
+import LoginPage from "../pages/LoginPage";
+import RegisterPage from "../pages/RegisterPage";
+import ProductAdminPage from "../pages/ProductAdminPage";
+import OrderAdminPage from "../pages/OrderAdminPage";
 
 const router = createBrowserRouter([
   {
@@ -30,6 +34,14 @@ const router = createBrowserRouter([
         element: <AdminPage />,
       },
       {
+        path: "/admin/products",
+        element: <ProductAdminPage />,
+      },
+      {
+        path: "/admin/orders",
+        element: <OrderAdminPage />,
+      },
+      {
         path: "/products",
         element: <ProductPage />,
       },
@@ -40,6 +52,14 @@ const router = createBrowserRouter([
       {
         path: "/about-me",
         element: <AboutMePage />,
+      },
+      {
+        path: "/login",
+        element: <LoginPage />,
+      },
+      {
+        path: "/register",
+        element: <RegisterPage />,
       },
     ],
   },

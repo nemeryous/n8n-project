@@ -42,7 +42,8 @@ public class OrderServiceImpl implements OrderService {
   private ProductRepository productRepository;
 
   @Override
-  public Order createOrderFromCart(Integer customerId, Integer cartId, String shippingAddress, String phoneNumber, String notes) {
+  public Order createOrderFromCart(Integer customerId, Integer cartId, String shippingAddress, String phoneNumber,
+      String notes) {
     // Find active cart
     Cart cart = cartRepository.findById(cartId)
         .orElseThrow(() -> new RuntimeException("Cart not found"));
@@ -125,16 +126,16 @@ public class OrderServiceImpl implements OrderService {
   // Private helper methods
   private BigDecimal calculateTotalAmount(List<CartItem> cartItems) {
     BigDecimal total = BigDecimal.ZERO;
-    
+
     for (CartItem cartItem : cartItems) {
       Product product = productRepository.findById(cartItem.getProductId())
           .orElseThrow(() -> new RuntimeException("Product not found: " + cartItem.getProductId()));
-      
+
       BigDecimal unitPrice = BigDecimal.valueOf(product.getPrice());
       BigDecimal itemTotal = unitPrice.multiply(BigDecimal.valueOf(cartItem.getQuantity()));
       total = total.add(itemTotal);
     }
-    
+
     return total;
   }
 
@@ -148,9 +149,10 @@ public class OrderServiceImpl implements OrderService {
       orderItem.setProductId(cartItem.getProductId());
       orderItem.setQuantity(cartItem.getQuantity());
       orderItem.setUnitPrice(BigDecimal.valueOf(product.getPrice()));
-      orderItem.setTotalPrice(BigDecimal.valueOf(product.getPrice()).multiply(BigDecimal.valueOf(cartItem.getQuantity())));
+      orderItem
+          .setTotalPrice(BigDecimal.valueOf(product.getPrice()).multiply(BigDecimal.valueOf(cartItem.getQuantity())));
       orderItem.setProductName(product.getName());
-      
+
       return orderItem;
     }).collect(Collectors.toList());
 
