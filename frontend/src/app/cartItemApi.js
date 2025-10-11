@@ -4,7 +4,14 @@ const BASE_URL = import.meta.env.VITE_BASE_URL;
 
 export const cartItemApi = createApi({
   reducerPath: "cartItemApi",
-  baseQuery: fetchBaseQuery({ baseUrl: BASE_URL }),
+  baseQuery: fetchBaseQuery({
+    baseUrl: BASE_URL,
+    prepareHeaders: (headers) => {
+      headers.set("ngrok-skip-browser-warning", "true");
+
+      return headers;
+    },
+  }),
   tagTypes: ["CartItem"],
   endpoints: (builder) => ({
     getCartItemsByCustomerId: builder.query({
