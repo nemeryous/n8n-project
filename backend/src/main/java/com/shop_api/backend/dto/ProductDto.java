@@ -10,25 +10,24 @@ import lombok.Data;
 @Data
 public class ProductDto {
 
-  @JsonProperty("id")
   private Integer id;
 
-  @JsonProperty("productName")
+  @JsonProperty("product_name")
   private String name;
 
-  @JsonProperty("productDescription")
+  @JsonProperty("product_description")
   private String description;
 
   @JsonProperty("price")
   private Double price;
 
-  @JsonProperty("stock")
+  @JsonProperty("stock_quantity")
   private Integer stockQuantity;
 
   @JsonProperty("category")
   private String category;
 
-  @JsonProperty("imageUrl")
+  @JsonProperty("image_url")
   private String imageUrl;
 
   @JsonProperty("currency")

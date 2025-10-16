@@ -22,12 +22,12 @@ import { motion } from "framer-motion";
 // Modal Form Component
 const ProductFormModal = ({ product, onClose, onSave, isLoading }) => {
   const [formData, setFormData] = useState({
-    productName: product?.name || "",
-    productDescription: product?.description || "",
+    product_name: product?.name || "",
+    product_description: product?.description || "",
     price: product?.price || 0,
-    stock: product?.stock_quantity || 0,
+    stock_quantity: product?.stock_quantity || 0,
     category: product?.category || "",
-    imageUrl: product?.image_url || "",
+    image_url: product?.image_url || "",
   });
 
   const handleChange = (e) => {
