@@ -4,10 +4,9 @@ export const cartApi = createApi({
   reducerPath: "cartApi",
   baseQuery: fetchBaseQuery({
     baseUrl: import.meta.env.VITE_BASE_URL,
-    prepareHeaders: (headers) => {
-      headers.set("ngrok-skip-browser-warning", "true");
-
-      return headers;
+    prepareHeaders: (header) => {
+      header.set("ngrok-skip-browser-warning", "true");
+      return header;
     },
   }),
   tagTypes: ["Cart"],

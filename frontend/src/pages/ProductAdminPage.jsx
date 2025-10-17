@@ -22,8 +22,8 @@ import { motion } from "framer-motion";
 // Modal Form Component
 const ProductFormModal = ({ product, onClose, onSave, isLoading }) => {
   const [formData, setFormData] = useState({
-    name: product?.name || "",
-    description: product?.description || "",
+    product_name: product?.name || "",
+    product_description: product?.description || "",
     price: product?.price || 0,
     stock_quantity: product?.stock_quantity || 0,
     category: product?.category || "",
@@ -69,15 +69,15 @@ const ProductFormModal = ({ product, onClose, onSave, isLoading }) => {
         <form onSubmit={handleSubmit} className="space-y-4">
           <InputField
             label="Tên sản phẩm"
-            name="name"
-            value={formData.name}
+            name="productName"
+            value={formData.productName}
             onChange={handleChange}
             required
           />
           <InputField
             label="Mô tả"
-            name="description"
-            value={formData.description}
+            name="productDescription"
+            value={formData.productDescription}
             onChange={handleChange}
             type="textarea"
           />
@@ -92,9 +92,9 @@ const ProductFormModal = ({ product, onClose, onSave, isLoading }) => {
             />
             <InputField
               label="Số lượng tồn kho"
-              name="stock_quantity"
+              name="stock"
               type="number"
-              value={formData.stock_quantity}
+              value={formData.stock}
               onChange={handleChange}
               required
             />
@@ -107,8 +107,8 @@ const ProductFormModal = ({ product, onClose, onSave, isLoading }) => {
           />
           <InputField
             label="URL Hình ảnh"
-            name="image_url"
-            value={formData.image_url}
+            name="imageUrl"
+            value={formData.imageUrl}
             onChange={handleChange}
           />
           <div className="flex justify-end pt-4">

@@ -186,6 +186,9 @@ public class CartServiceImpl implements CartService {
       cart.setCreatedAt(Instant.now());
       cart.setUpdatedAt(Instant.now());
       cart = cartRepository.save(cart);
+
+      n8nWebHookService.triggerCartCreatedWebhook(CartDto.fromEntity(cart));
+
     }
 
     return CartDto.fromEntity(cart);

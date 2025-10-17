@@ -10,13 +10,12 @@ import lombok.Data;
 @Data
 public class ProductDto {
 
-  @JsonProperty("id")
   private Integer id;
 
-  @JsonProperty("name")
+  @JsonProperty("product_name")
   private String name;
 
-  @JsonProperty("description")
+  @JsonProperty("product_description")
   private String description;
 
   @JsonProperty("price")
@@ -31,6 +30,9 @@ public class ProductDto {
   @JsonProperty("image_url")
   private String imageUrl;
 
+  @JsonProperty("currency")
+  private String currency;
+
   public static ProductDto fromEntity(Product product) {
 
     ProductDto dto = new ProductDto();
@@ -41,6 +43,7 @@ public class ProductDto {
     dto.setStockQuantity(product.getStockQuantity());
     dto.setCategory(product.getCategory());
     dto.setImageUrl(product.getImageUrl());
+    dto.setCurrency(product.getCurrency());
 
     return dto;
 
@@ -55,6 +58,8 @@ public class ProductDto {
     product.setStockQuantity(dto.getStockQuantity());
     product.setCategory(dto.getCategory());
     product.setImageUrl(dto.getImageUrl());
+    product.setCurrency(dto.getCurrency());
+
     return product;
   }
 
