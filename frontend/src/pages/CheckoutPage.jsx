@@ -23,7 +23,7 @@ import { useCreateOrderMutation } from "../app/orderApi";
 const SHIPPING_FEE = 30000;
 
 export default function CheckoutPage() {
-  const customerId = 1; // Giả sử, sẽ lấy từ state auth
+  const customerId = 1;
   const { data: cart, isLoading: isCartLoading } =
     useGetOrCreateCartByCustomerQuery(customerId);
   const {

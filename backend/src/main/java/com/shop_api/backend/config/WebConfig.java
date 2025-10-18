@@ -6,11 +6,10 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 @Configuration
 public class WebConfig implements WebMvcConfigurer {
-  @Override
-  public void addCorsMappings(CorsRegistry registry) {
-    registry.addMapping("/**") // Áp dụng cho tất cả các đường dẫn
-        .allowedOrigins("*") // Cho phép tất cả các nguồn gốc
-        .allowedMethods("GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS") // Các phương thức được phép
-        .allowedHeaders("*"); // Cho phép tất cả các header
-  }
+    @Override
+    public void addCorsMappings(CorsRegistry registry) {
+        registry.addMapping("/**").allowedOrigins("*")
+                .allowedMethods("GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS")
+                .allowedHeaders("*");
+    }
 }

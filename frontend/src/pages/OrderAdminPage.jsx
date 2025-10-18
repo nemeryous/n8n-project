@@ -15,6 +15,7 @@ import {
 } from "@fortawesome/free-solid-svg-icons";
 import { AnimatePresence } from "framer-motion";
 import OrderDetailModal from "../components/OrderDetailModal";
+import { motion } from "framer-motion";
 
 const statusOptions = [
   "PENDING",
