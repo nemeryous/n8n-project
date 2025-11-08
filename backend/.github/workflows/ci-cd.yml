@@ -1,0 +1,54 @@
+name: Spring Boot CI/CD (Bỏ qua 
+on:
+  push:
+    branches: [ "main" ]
+
+jobs:
+  build:
+    name: Build (Tạo file JAR)
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v3
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+          cache: 'maven'
+
+      - name: Build với Maven (Bỏ qua Test)
+        run: mvn clean package -DskipTests
+
+      - name: Upload JAR artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: spring-boot-jar
+          path: target/*.jar
+
+  deploy:
+    name: Deploy (Triển khai)
+    needs: build
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Download JAR artifact
+        uses: actions/download-artifact@v3
+        with:
+          name: spring-boot-jar
+
+      - name: Deploy tới Server (Ví dụ: dùng SCP/SSH)
+        run: |
+          echo "Bắt đầu deploy..."
+          # Ví dụ: Sao chép file JAR tới server bằng SCP
+          # Bạn cần cài đặt SSH keys qua GitHub Secrets
+          # scp -i $HOME/.ssh/id_rsa *.jar user@your-server-ip:/path/to/app/
+
+          # Ví dụ: Khởi động lại dịch vụ trên server bằng SSH
+          # ssh -i $HOME/.ssh/id_rsa user@your-server-ip 'sudo systemctl restart my-spring-boot-service'
+          
+          echo "Đây chỉ là bước ví dụ. Bạn cần thay thế bằng kịch bản deploy thực tế."
+          echo "File JAR đã được tải về: "
+          ls -l
