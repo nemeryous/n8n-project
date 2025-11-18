@@ -76,10 +76,9 @@ public class CheckoutController {
 
             OrderDto orderDto = OrderDto.fromEntity(updatedOrder);
             if (orderDto.getStatus() == OrderStatus.PROCESSING) {
-                n8nWebHookService.triggerShippingUpdatedWebhook(orderDto);
+                n8nWebHookService.triggerShippingUpdatedWebhook(orderId);
             } else if (orderDto.getStatus() == OrderStatus.DELIVERED) {
-
-                n8nWebHookService.triggerOrderDeliveredWebhook(orderDto);
+                // n8nWebHookService.triggerOrderDeliveredWebhook(orderId);
             }
 
             return ResponseEntity.ok(OrderDto.fromEntity(updatedOrder));

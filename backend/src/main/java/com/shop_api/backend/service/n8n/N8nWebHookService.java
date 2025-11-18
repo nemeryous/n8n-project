@@ -76,13 +76,13 @@ public class N8nWebHookService {
         }
     }
 
-    public void triggerOrderDeliveredWebhook(Integer orderId) {
-        try {
-            log.info("Triggering N8N webhook for order delivered: {}", orderId);
-            restTemplate.postForObject(n8nWebhookUrl + "/order-delivered", orderId, String.class);
-        } catch (Exception e) {
-            log.error("Failed to trigger N8N webhook for order ID: {}. Error: {}", orderId,
-                    e.getMessage());
-        }
-    }
+    // public void triggerOrderDeliveredWebhook(Integer orderId) {
+    // try {
+    // log.info("Triggering N8N webhook for order delivered: {}", orderId);
+    // restTemplate.postForObject(n8nWebhookUrl + "/order-delivered", orderId, String.class);
+    // } catch (Exception e) {
+    // log.error("Failed to trigger N8N webhook for order ID: {}. Error: {}", orderId,
+    // e.getMessage());
+    // }
+    // }
 }

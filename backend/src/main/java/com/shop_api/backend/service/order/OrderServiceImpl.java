@@ -12,6 +12,8 @@ import com.shop_api.backend.entity.CartItem;
 import com.shop_api.backend.entity.Order;
 import com.shop_api.backend.entity.OrderItem;
 import com.shop_api.backend.entity.Product;
+import com.shop_api.backend.exception.BadRequestException;
+import com.shop_api.backend.exception.ResourceNotFoundException;
 import com.shop_api.backend.repository.CartItemRepository;
 import com.shop_api.backend.repository.CartRepository;
 import com.shop_api.backend.repository.OrderItemRepository;
@@ -48,20 +50,20 @@ public class OrderServiceImpl implements OrderService {
             String phoneNumber, String notes) {
         // Find active cart
         Cart cart = cartRepository.findById(cartId)
-                .orElseThrow(() -> new RuntimeException("Cart not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("Giỏ hàng", "id", cartId));
 
         if (!cart.getCustomerId().equals(customerId)) {
-            throw new RuntimeException("Cart does not belong to customer");
+            throw new BadRequestException("Giỏ hàng không thuộc về khách hàng này");
         }
 
         if (cart.getStatus() != CartStatus.ACTIVE) {
-            throw new RuntimeException("Cart is not active");
+            throw new BadRequestException("Giỏ hàng không ở trạng thái hoạt động");
         }
 
         // Get cart items
         List<CartItem> cartItems = cartItemRepository.findByCartId(cartId);
         if (cartItems.isEmpty()) {
-            throw new RuntimeException("Cart is empty");
+            throw new BadRequestException("Giỏ hàng trống");
         }
 
         // Calculate total amount
@@ -97,7 +99,7 @@ public class OrderServiceImpl implements OrderService {
     @Override
     public Order getOrderById(Integer orderId) {
         return orderRepository.findById(orderId)
-                .orElseThrow(() -> new RuntimeException("Order not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("Đơn hàng", "id", orderId));
     }
 
     @Override
@@ -119,7 +121,7 @@ public class OrderServiceImpl implements OrderService {
         order.setUpdatedAt(Instant.now());
 
         if (status.equals(OrderStatus.DELIVERED)) {
-            n8nWebHookService.triggerOrderDeliveredWebhook(orderId);
+            // n8nWebHookService.triggerOrderDeliveredWebhook(orderId);
         } else {
             n8nWebHookService.triggerShippingUpdatedWebhook(orderId);
         }
@@ -137,7 +139,7 @@ public class OrderServiceImpl implements OrderService {
 
         for (CartItem cartItem : cartItems) {
             Product product = productRepository.findById(cartItem.getProductId()).orElseThrow(
-                    () -> new RuntimeException("Product not found: " + cartItem.getProductId()));
+                    () -> new ResourceNotFoundException("Sản phẩm", "id", cartItem.getProductId()));
 
             BigDecimal unitPrice = BigDecimal.valueOf(product.getPrice());
             BigDecimal itemTotal = unitPrice.multiply(BigDecimal.valueOf(cartItem.getQuantity()));
@@ -150,7 +152,7 @@ public class OrderServiceImpl implements OrderService {
     private void createOrderItems(Integer orderId, List<CartItem> cartItems) {
         List<OrderItem> orderItems = cartItems.stream().map(cartItem -> {
             Product product = productRepository.findById(cartItem.getProductId()).orElseThrow(
-                    () -> new RuntimeException("Product not found: " + cartItem.getProductId()));
+                    () -> new ResourceNotFoundException("Sản phẩm", "id", cartItem.getProductId()));
 
             OrderItem orderItem = new OrderItem();
             orderItem.setOrderId(orderId);
