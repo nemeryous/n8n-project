@@ -62,9 +62,10 @@ jobs:
       - name: 🏗️ Build Package
         run: |
           mvn clean package -DskipTests
-          mv target/*.jar target/app.jar
+          # Project build ra file .war, đổi tên thành app.jar để dễ deploy
+          mv target/*.war target/app.jar
 
-      # Quan trọng: Lưu file JAR lại để chuyển sang Job Deploy
+      # Quan trọng: Lưu file JAR/WAR lại để chuyển sang Job Deploy
       - name: 💾 Upload Artifact
         uses: actions/upload-artifact@v4
         with:
