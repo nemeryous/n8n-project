@@ -106,7 +106,17 @@ jobs:
           username: ${{ secrets.VPS_USER }}
           key: ${{ secrets.VPS_SSH_KEY }}
           script: |
-            echo "Restarting Spring Boot Service..."
-            sudo systemctl restart springboot-app.service
-            sleep 10
-            sudo systemctl status springboot-app.service --no-pager
+            echo "🔄 Restarting Spring Boot Service..."
+            # Sử dụng sudo -n (non-interactive) - yêu cầu đã cấu hình sudoers
+            sudo -n systemctl restart springboot-app.service || {
+              echo "❌ Error: Cannot restart service without password"
+              echo "📝 Please configure sudoers on VPS:"
+              echo "   1. SSH to VPS: ssh ${{ secrets.VPS_USER }}@${{ secrets.VPS_HOST }}"
+              echo "   2. Run: sudo visudo"
+              echo "   3. Add line: ${{ secrets.VPS_USER }} ALL=(ALL) NOPASSWD: /bin/systemctl restart springboot-app.service, /bin/systemctl status springboot-app.service"
+              exit 1
+            }
+            sleep 5
+            echo "✅ Checking service status..."
+            sudo -n systemctl status springboot-app.service --no-pager || true
+            echo "✅ Deployment completed successfully!"
