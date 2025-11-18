@@ -1,54 +1,77 @@
-name: CI/CD Backend Pipeline
+name: Backend CI/CD Pipeline
 
 on:
   push:
     branches: [ "main" ]
 
 jobs:
-  build-and-deploy:
+  # ========================================================
+  # JOB 1: QUALITY CHECKS (Kiểm tra chất lượng & Test)
+  # ========================================================
+  quality:
+    name: 🕵️ Quality Checks
     runs-on: ubuntu-latest
     steps:
-      # ---------------------------------------------------
-      # BƯỚC 1: CHUẨN BỊ & TẢI THƯ VIỆN
-      # ---------------------------------------------------
       - uses: actions/checkout@v3
-
+      
       - name: Set up JDK 17
         uses: actions/setup-java@v3
         with:
           java-version: '17'
           distribution: 'temurin'
-          cache: maven # Tự động cache thư viện để lần sau chạy nhanh hơn
+          cache: maven
 
-      - name: Download Dependencies
-        # Tải toàn bộ thư viện về trước khi chạy các bước sau
+      - name: Resolve Dependencies
         run: mvn dependency:go-offline
 
-      # ---------------------------------------------------
-      # BƯỚC 2: QUALITY CHECK (Kiểm tra chất lượng)
-      # ---------------------------------------------------
-      - name: Code Quality Check
-        run: mvn validate
-
-      # ---------------------------------------------------
-      # BƯỚC 3: UNIT TEST (Kiểm tra logic)
-      # ---------------------------------------------------
       - name: Run Unit Tests
         run: mvn test
 
-      # ---------------------------------------------------
-      # BƯỚC 4: BUILD (Đóng gói file .jar)
-      # ---------------------------------------------------
+  # ========================================================
+  # JOB 2: BUILD PROJECT (Đóng gói file JAR)
+  # ========================================================
+  build:
+    name: 🏗 Build Project
+    needs: quality  # Chỉ chạy khi Job 'quality' thành công
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      
+      - name: Set up JDK 17
+        uses: actions/setup-java@v3
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+          cache: maven
+
       - name: Build Package
         run: |
-          # Build và bỏ qua test (vì đã test ở bước trên rồi)
           mvn clean package -DskipTests
-          # Đổi tên file cho gọn
           mv target/*.jar target/app.jar
 
-      # ---------------------------------------------------
-      # BƯỚC 5: DEPLOY (Đẩy lên folder backend)
-      # ---------------------------------------------------
+      # Quan trọng: Lưu file JAR lại để chuyển sang Job Deploy
+      - name: Upload Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: spring-app
+          path: target/app.jar
+          retention-days: 1
+
+  # ========================================================
+  # JOB 3: DEPLOY TO VPS (Đẩy lên server)
+  # ========================================================
+  deploy:
+    name: 🚀 Deploy to VPS
+    needs: build  # Chỉ chạy khi Job 'build' thành công
+    runs-on: ubuntu-latest
+    steps:
+      # Tải file JAR từ Job 'build' về
+      - name: Download Artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: spring-app
+          path: target
+
       - name: Copy JAR to VPS
         uses: appleboy/scp-action@master
         with:
@@ -66,9 +89,7 @@ jobs:
           username: ${{ secrets.VPS_USER }}
           key: ${{ secrets.VPS_SSH_KEY }}
           script: |
-            # Restart service để nhận code mới
+            echo "Restarting Spring Boot Service..."
             sudo systemctl restart springboot-app.service
-            
-            # Chờ 10s và kiểm tra trạng thái
             sleep 10
             sudo systemctl status springboot-app.service --no-pager
