@@ -28,6 +28,8 @@ import lombok.extern.slf4j.Slf4j;
 @RequestMapping("${api.prefix}/admin")
 @RequiredArgsConstructor
 @PreAuthorize("hasRole('ADMIN')")
+@io.swagger.v3.oas.annotations.tags.Tag(name = "Admin",
+        description = "API quản trị - Chỉ dành cho ADMIN. Yêu cầu JWT token với role ADMIN.")
 public class AdminController {
 
     private final CustomerRepository customerRepository;
@@ -35,6 +37,14 @@ public class AdminController {
     /**
      * Lấy danh sách tất cả customers Chỉ ADMIN mới có quyền truy cập
      */
+    @io.swagger.v3.oas.annotations.Operation(summary = "Lấy danh sách tất cả khách hàng",
+            description = "Chỉ ADMIN mới có quyền truy cập. Yêu cầu JWT token với role ADMIN.")
+    @io.swagger.v3.oas.annotations.responses.ApiResponses(value = {
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "200",
+                    description = "Lấy danh sách thành công"),
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "403",
+                    description = "Không có quyền truy cập (chỉ ADMIN)")})
+    @io.swagger.v3.oas.annotations.security.SecurityRequirement(name = "bearerAuth")
     @GetMapping("/customers")
     public ResponseEntity<ApiResponse<List<CustomerDto>>> getAllCustomers() {
         log.info("GET /admin/customers - Admin accessing all customers");
@@ -48,8 +58,13 @@ public class AdminController {
     /**
      * Lấy thông tin customer theo ID Chỉ ADMIN mới có quyền truy cập
      */
+    @io.swagger.v3.oas.annotations.Operation(summary = "Lấy thông tin khách hàng theo ID",
+            description = "Chỉ ADMIN mới có quyền truy cập")
+    @io.swagger.v3.oas.annotations.security.SecurityRequirement(name = "bearerAuth")
     @GetMapping("/customers/{id}")
-    public ResponseEntity<ApiResponse<CustomerDto>> getCustomerById(@PathVariable Integer id) {
+    public ResponseEntity<ApiResponse<CustomerDto>> getCustomerById(
+            @io.swagger.v3.oas.annotations.Parameter(description = "ID của khách hàng",
+                    required = true) @PathVariable Integer id) {
         log.info("GET /admin/customers/{} - Admin accessing customer", id);
 
         Customer customer = customerRepository.findById(id)
@@ -61,8 +76,13 @@ public class AdminController {
     /**
      * Cập nhật role của customer Chỉ ADMIN mới có quyền thực hiện
      */
+    @io.swagger.v3.oas.annotations.Operation(summary = "Cập nhật role của khách hàng",
+            description = "Chỉ ADMIN mới có quyền thực hiện. Có thể thay đổi role giữa USER và ADMIN.")
+    @io.swagger.v3.oas.annotations.security.SecurityRequirement(name = "bearerAuth")
     @PutMapping("/customers/{id}/role")
-    public ResponseEntity<ApiResponse<CustomerDto>> updateCustomerRole(@PathVariable Integer id,
+    public ResponseEntity<ApiResponse<CustomerDto>> updateCustomerRole(
+            @io.swagger.v3.oas.annotations.Parameter(description = "ID của khách hàng",
+                    required = true) @PathVariable Integer id,
             @Valid @RequestBody UpdateRoleRequest request) {
         log.info("PUT /admin/customers/{}/role - Admin updating customer role to {}", id,
                 request.getRole());
@@ -83,8 +103,13 @@ public class AdminController {
     /**
      * Xóa customer Chỉ ADMIN mới có quyền thực hiện
      */
+    @io.swagger.v3.oas.annotations.Operation(summary = "Xóa khách hàng",
+            description = "Chỉ ADMIN mới có quyền thực hiện. Xóa vĩnh viễn khách hàng khỏi hệ thống.")
+    @io.swagger.v3.oas.annotations.security.SecurityRequirement(name = "bearerAuth")
     @DeleteMapping("/customers/{id}")
-    public ResponseEntity<ApiResponse<String>> deleteCustomer(@PathVariable Integer id) {
+    public ResponseEntity<ApiResponse<String>> deleteCustomer(
+            @io.swagger.v3.oas.annotations.Parameter(description = "ID của khách hàng",
+                    required = true) @PathVariable Integer id) {
         log.info("DELETE /admin/customers/{} - Admin deleting customer", id);
 
         Customer customer = customerRepository.findById(id)
