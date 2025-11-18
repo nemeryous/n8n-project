@@ -22,7 +22,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-
 @RestController
 @RequestMapping("${api.prefix}/checkout")
 public class CheckoutController {
@@ -71,14 +70,14 @@ public class CheckoutController {
     public ResponseEntity<OrderDto> updateOrderStatus(@PathVariable Integer orderId,
             @RequestBody OrderStatusUpdateDto statusUpdate) {
         try {
-            Order updatedOrder =
-                    checkoutService.updateOrderStatus(orderId, statusUpdate.getStatus());
+            Order updatedOrder = checkoutService.updateOrderStatus(orderId, statusUpdate.getStatus());
 
             OrderDto orderDto = OrderDto.fromEntity(updatedOrder);
             if (orderDto.getStatus() == OrderStatus.PROCESSING) {
                 n8nWebHookService.triggerShippingUpdatedWebhook(orderId);
             } else if (orderDto.getStatus() == OrderStatus.DELIVERED) {
-                // n8nWebHookService.triggerOrderDeliveredWebhook(orderId);
+
+                n8nWebHookService.triggerOrderDeliveredWebhook(orderId);
             }
 
             return ResponseEntity.ok(OrderDto.fromEntity(updatedOrder));
