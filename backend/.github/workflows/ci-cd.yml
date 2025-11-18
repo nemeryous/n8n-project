@@ -1,54 +1,66 @@
-name: Spring Boot CI/CD (Bỏ qua 
+name: CI/CD Pipeline
+
 on:
   push:
     branches: [ "main" ]
 
 jobs:
-  build:
-    name: Build (Tạo file JAR)
+  build-and-deploy:
     runs-on: ubuntu-latest
-
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v3
+    # ---------------------------------------------------
+    # 1. CHUẨN BỊ MÔI TRƯỜNG
+    # ---------------------------------------------------
+    - uses: actions/checkout@v3
 
-      - name: Set up JDK 17
-        uses: actions/setup-java@v3
-        with:
-          java-version: '17'
-          distribution: 'temurin'
-          cache: 'maven'
+    - name: Set up JDK 17
+      uses: actions/setup-java@v3
+      with:
+        java-version: '17'
+        distribution: 'temurin'
+        cache: maven
 
-      - name: Build với Maven (Bỏ qua Test)
-        run: mvn clean package -DskipTests
+    # ---------------------------------------------------
+    # 2. QUALITY & TEST
+    # ---------------------------------------------------
+    - name: Run Unit Tests
+      run: mvn test
+      # Nếu test lỗi, quy trình dừng ngay tại đây
 
-      - name: Upload JAR artifact
-        uses: actions/upload-artifact@v3
-        with:
-          name: spring-boot-jar
-          path: target/*.jar
+    # ---------------------------------------------------
+    # 3. BUILD FILE JAR
+    # ---------------------------------------------------
+    - name: Build Package
+      run: mvn clean package -DskipTests
 
-  deploy:
-    name: Deploy (Triển khai)
-    needs: build
-    runs-on: ubuntu-latest
+    - name: Rename jar file
+      run: mv target/*.jar target/app.jar
 
-    steps:
-      - name: Download JAR artifact
-        uses: actions/download-artifact@v3
-        with:
-          name: spring-boot-jar
+    # ---------------------------------------------------
+    # 4. DEPLOY (Sử dụng biến VPS_...)
+    # ---------------------------------------------------
+    - name: Copy JAR to VPS
+      uses: appleboy/scp-action@master
+      with:
+        host: ${{ secrets.VPS_HOST }}     
+        username: ${{ secrets.VPS_USER }}
+        key: ${{ secrets.VPS_SSH_KEY }}
+        source: "target/app.jar"
 
-      - name: Deploy tới Server (Ví dụ: dùng SCP/SSH)
-        run: |
-          echo "Bắt đầu deploy..."
-          # Ví dụ: Sao chép file JAR tới server bằng SCP
-          # Bạn cần cài đặt SSH keys qua GitHub Secrets
-          # scp -i $HOME/.ssh/id_rsa *.jar user@your-server-ip:/path/to/app/
+        target: "/home/${{ secrets.VPS_USER }}/backend"
+        strip_components: 1
 
-          # Ví dụ: Khởi động lại dịch vụ trên server bằng SSH
-          # ssh -i $HOME/.ssh/id_rsa user@your-server-ip 'sudo systemctl restart my-spring-boot-service'
+    - name: Restart Spring Boot Service
+      uses: appleboy/ssh-action@master
+      with:
+        host: ${{ secrets.VPS_HOST }}     
+        username: ${{ secrets.VPS_USER }} 
+        key: ${{ secrets.VPS_SSH_KEY }}   
+        script: |
+          echo "Deploying to VPS..."
+          # Restart lại service systemd
+          sudo systemctl restart springboot-app.service
           
-          echo "Đây chỉ là bước ví dụ. Bạn cần thay thế bằng kịch bản deploy thực tế."
-          echo "File JAR đã được tải về: "
-          ls -l
+          # Chờ 10s và kiểm tra trạng thái
+          sleep 10
+          sudo systemctl status springboot-app.service --no-pager
