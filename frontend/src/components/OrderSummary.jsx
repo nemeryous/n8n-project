@@ -9,7 +9,7 @@ import {
 const OrderSummary = ({ cartItems, shippingFee }) => {
   const subtotal = cartItems.reduce(
     (sum, item) => (item ? sum + item.unit_price * item.quantity : sum),
-    0
+    0,
   );
   const total = subtotal + shippingFee;
 

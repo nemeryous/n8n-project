@@ -14,7 +14,7 @@ const Header = () => {
     cart?.id,
     {
       skip: !cart, // Bỏ qua query này nếu chưa có cart
-    }
+    },
   );
 
   const cartCount = isLoading

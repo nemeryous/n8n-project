@@ -1,11 +1,7 @@
 import React, { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import {
-  faShoppingCart,
-  faHeart,
-  faStar,
-} from "@fortawesome/free-solid-svg-icons";
+import { faShoppingCart, faHeart } from "@fortawesome/free-solid-svg-icons";
 
 const ProductCard = ({ product, onAddToCart }) => {
   const [isHovered, setIsHovered] = useState(false);

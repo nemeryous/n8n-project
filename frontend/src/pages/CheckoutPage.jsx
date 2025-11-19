@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
@@ -73,7 +73,7 @@ export default function CheckoutPage() {
 
       const subtotal = cartItems.reduce(
         (sum, item) => sum + item.product.price * item.quantity,
-        0
+        0,
       );
       const total = subtotal + SHIPPING_FEE;
 
