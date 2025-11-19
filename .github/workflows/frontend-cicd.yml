@@ -91,6 +91,20 @@ jobs:
           echo "Listing build-artifact contents:"
           find build-artifact -type f | head -20 || echo "No files found"
 
+      - name: 🛠️ Prepare VPS Directory
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.VPS_HOST }}
+          username: ${{ secrets.VPS_USER }}
+          key: ${{ secrets.VPS_SSH_KEY }}
+          port: 22
+          script: |
+            echo "Preparing deployment directory..."
+            # Tạo thư mục nếu chưa tồn tại
+            sudo mkdir -p /var/www/my-app
+            # Cấp quyền sở hữu cho user hiện tại (để scp có thể ghi vào)
+            sudo chown -R $USER:$USER /var/www/my-app
+
       - name: 📤 Copy files to VPS
         uses: appleboy/scp-action@master
         with:
