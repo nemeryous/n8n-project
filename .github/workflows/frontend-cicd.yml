@@ -100,10 +100,19 @@ jobs:
           port: 22
           script: |
             echo "Preparing deployment directory..."
-            # Tạo thư mục nếu chưa tồn tại
-            sudo mkdir -p /var/www/my-app
-            # Cấp quyền sở hữu cho user hiện tại (để scp có thể ghi vào)
-            sudo chown -R $USER:$USER /var/www/my-app
+            # Thử tạo thư mục (dùng sudo -n để fail nếu cần password)
+            if ! sudo -n mkdir -p /var/www/my-app; then
+                echo "❌ Error: Cannot create directory /var/www/my-app (Permission denied & sudo requires password)"
+                echo "📝 Please configure sudoers on VPS:"
+                echo "   1. SSH to VPS: ssh ${{ secrets.VPS_USER }}@${{ secrets.VPS_HOST }}"
+                echo "   2. Run: sudo visudo"
+                echo "   3. Add line: ${{ secrets.VPS_USER }} ALL=(ALL) NOPASSWD: /usr/bin/mkdir, /usr/bin/chown"
+                exit 1
+            fi
+            
+            # Cấp quyền sở hữu
+            sudo -n chown -R $USER:$USER /var/www/my-app
+            echo "✅ Directory prepared successfully"
 
       - name: 📤 Copy files to VPS
         uses: appleboy/scp-action@master
