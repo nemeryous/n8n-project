@@ -96,4 +96,11 @@ jobs:
 
           script: |
             echo "Deploy successful, reloading Nginx..."
-            sudo systemctl reload nginx
+            sudo systemctl reload nginx || {
+              echo "❌ Error: Cannot restart service without password"
+              echo "📝 Please configure sudoers on VPS:"
+              echo "   1. SSH to VPS: ssh ${{ secrets.VPS_USER }}@${{ secrets.VPS_HOST }}"
+              echo "   2. Run: sudo visudo"
+              echo "   3. Add line: ${{ secrets.VPS_USER }} ALL=(ALL) NOPASSWD: /bin/systemctl restart springboot-app.service, /bin/systemctl status springboot-app.service"
+              exit 1
+            }
