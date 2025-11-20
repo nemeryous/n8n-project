@@ -1,5 +1,6 @@
 import React from "react";
 import { motion, AnimatePresence } from "framer-motion";
+import { useSelector } from "react-redux";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   faShoppingCart,
@@ -23,15 +24,18 @@ import { useCreateOrderMutation } from "../app/orderApi";
 const SHIPPING_FEE = 30000;
 
 export default function CheckoutPage() {
-  const customerId = 1;
+  const { user } = useSelector((state) => state.auth);
+  const customerId = user?.id || null;
   const { data: cart, isLoading: isCartLoading } =
-    useGetOrCreateCartByCustomerQuery(customerId);
+    useGetOrCreateCartByCustomerQuery(customerId, {
+      skip: !customerId,
+    });
   const {
     data: cartItems = [],
     isLoading: areItemsLoading,
     error: itemsError,
   } = useGetCartItemsByCustomerIdQuery(customerId, {
-    skip: !cart,
+    skip: !cart || !customerId,
   });
 
   const [updateCartItem] = useUpdateCartItemMutation();

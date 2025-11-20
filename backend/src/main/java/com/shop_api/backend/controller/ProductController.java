@@ -3,6 +3,7 @@ package com.shop_api.backend.controller;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import com.shop_api.backend.common.PageResponse;
@@ -19,6 +20,7 @@ public class ProductController {
   private ProductService productService;
 
   @GetMapping
+  @PreAuthorize("permitAll()")
   public ResponseEntity<PageResponse<ProductDto>> getAllProducts(
       @RequestParam(defaultValue = "0") int page,
       @RequestParam(defaultValue = "10") int size,
@@ -30,18 +32,21 @@ public class ProductController {
   }
 
   @GetMapping("/{id}")
+  @PreAuthorize("permitAll()")
   public ResponseEntity<ProductDto> getProductById(@PathVariable Integer id) {
     ProductDto product = productService.getProductById(id);
     return ResponseEntity.ok(product);
   }
 
   @PostMapping
+  @PreAuthorize("hasRole('ADMIN')")
   public ResponseEntity<ProductDto> createProduct(@RequestBody CreateProductDto dto) {
     ProductDto createdProduct = productService.createProduct(dto);
     return ResponseEntity.status(HttpStatus.CREATED).body(createdProduct);
   }
 
   @PutMapping("/{id}")
+  @PreAuthorize("hasRole('ADMIN')")
   public ResponseEntity<ProductDto> updateProduct(@PathVariable Integer id,
       @RequestBody UpdateProductDto dto) {
     ProductDto updatedProduct = productService.updateProduct(id, dto);
@@ -49,6 +54,7 @@ public class ProductController {
   }
 
   @DeleteMapping("/{id}")
+  @PreAuthorize("hasRole('ADMIN')")
   public ResponseEntity<Void> deleteProduct(@PathVariable Integer id) {
     boolean deleted = productService.deleteProduct(id);
     return deleted ? ResponseEntity.noContent().build()

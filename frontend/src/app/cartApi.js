@@ -4,9 +4,13 @@ export const cartApi = createApi({
   reducerPath: "cartApi",
   baseQuery: fetchBaseQuery({
     baseUrl: import.meta.env.VITE_BASE_URL,
-    prepareHeaders: (header) => {
-      header.set("ngrok-skip-browser-warning", "true");
-      return header;
+    prepareHeaders: (headers, { getState }) => {
+      const token = getState().auth?.accessToken;
+      if (token) {
+        headers.set("authorization", `Bearer ${token}`);
+      }
+      headers.set("ngrok-skip-browser-warning", "true");
+      return headers;
     },
   }),
   tagTypes: ["Cart"],
