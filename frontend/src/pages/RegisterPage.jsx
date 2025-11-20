@@ -114,9 +114,12 @@ const RegisterPage = () => {
       // Xử lý lỗi từ API
       if (err.data) {
         const errorData = err.data;
-        
+
         // Xử lý validation errors từ server
-        if (errorData.validation_errors && Array.isArray(errorData.validation_errors)) {
+        if (
+          errorData.validation_errors &&
+          Array.isArray(errorData.validation_errors)
+        ) {
           const validationErrors = {};
           errorData.validation_errors.forEach((error) => {
             validationErrors[error.field] = error.message;
@@ -124,7 +127,9 @@ const RegisterPage = () => {
           setApiErrors(validationErrors);
         } else {
           // Hiển thị thông báo lỗi chung
-          setApiErrors({ general: errorData.message || "Đăng ký thất bại. Vui lòng thử lại." });
+          setApiErrors({
+            general: errorData.message || "Đăng ký thất bại. Vui lòng thử lại.",
+          });
         }
       } else {
         setApiErrors({ general: "Đăng ký thất bại. Vui lòng thử lại." });

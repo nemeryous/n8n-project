@@ -6,7 +6,7 @@ const getInitialState = () => {
   if (storedAuth) {
     try {
       return JSON.parse(storedAuth);
-    } catch (error) {
+    } catch {
       localStorage.removeItem("auth");
       return {
         user: null,
@@ -65,4 +65,3 @@ const authSlice = createSlice({
 
 export const { setCredentials, logout } = authSlice.actions;
 export default authSlice.reducer;
-

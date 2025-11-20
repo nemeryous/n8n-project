@@ -57,7 +57,7 @@ const baseQueryWithReauth = async (args, api, extraOptions) => {
           method: "POST",
         },
         api,
-        { ...extraOptions, skipRefresh: true } // Skip refresh cho chính request refresh
+        { ...extraOptions, skipRefresh: true }, // Skip refresh cho chính request refresh
       );
 
       if (refreshResult?.data) {

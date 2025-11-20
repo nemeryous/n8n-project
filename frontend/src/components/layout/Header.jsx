@@ -5,6 +5,7 @@ import {
   faUser,
   faSignOutAlt,
   faChevronDown,
+  faCog,
 } from "@fortawesome/free-solid-svg-icons";
 import NavLink from "../ui/NavLink";
 import { Link, useNavigate } from "react-router-dom";
@@ -89,9 +90,7 @@ const Header = () => {
             <NavLink to="/">Trang chủ</NavLink>
             <NavLink to="/products">Sản phẩm</NavLink>
             <NavLink to="/about-me">Về chúng tôi</NavLink>
-            {user?.role === "ADMIN" && (
-              <NavLink to="/admin">Admin</NavLink>
-            )}
+            {user?.role === "ADMIN" && <NavLink to="/admin">Admin</NavLink>}
           </nav>
 
           <div className="flex items-center space-x-4">
@@ -146,6 +145,16 @@ const Header = () => {
                         </p>
                         <p className="text-xs text-gray-500">{user.email}</p>
                       </div>
+                      {user.role === "ADMIN" && (
+                        <Link
+                          to="/admin"
+                          onClick={() => setShowUserMenu(false)}
+                          className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 flex items-center space-x-2"
+                        >
+                          <FontAwesomeIcon icon={faCog} />
+                          <span>Quản lý</span>
+                        </Link>
+                      )}
                       <button
                         onClick={handleLogout}
                         className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 flex items-center space-x-2"
