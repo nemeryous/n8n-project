@@ -12,6 +12,7 @@ import RegisterPage from "../pages/RegisterPage";
 import ProductAdminPage from "../pages/ProductAdminPage";
 import OrderAdminPage from "../pages/OrderAdminPage";
 import CustomerAdminPage from "../pages/CustomerAdminPage";
+import ProtectedRoute from "../components/ProtectedRoute";
 
 const router = createBrowserRouter([
   {
@@ -32,19 +33,35 @@ const router = createBrowserRouter([
       },
       {
         path: "/admin",
-        element: <AdminPage />,
+        element: (
+          <ProtectedRoute requiredRole="ADMIN">
+            <AdminPage />
+          </ProtectedRoute>
+        ),
       },
       {
         path: "/admin/products",
-        element: <ProductAdminPage />,
+        element: (
+          <ProtectedRoute requiredRole="ADMIN">
+            <ProductAdminPage />
+          </ProtectedRoute>
+        ),
       },
       {
         path: "/admin/orders",
-        element: <OrderAdminPage />,
+        element: (
+          <ProtectedRoute requiredRole="ADMIN">
+            <OrderAdminPage />
+          </ProtectedRoute>
+        ),
       },
       {
         path: "/admin/users",
-        element: <CustomerAdminPage />,
+        element: (
+          <ProtectedRoute requiredRole="ADMIN">
+            <CustomerAdminPage />
+          </ProtectedRoute>
+        ),
       },
       {
         path: "/products",
