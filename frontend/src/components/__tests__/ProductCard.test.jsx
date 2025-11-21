@@ -6,7 +6,7 @@ describe("ProductCard", () => {
   it("renders product information", () => {
     const mockProduct = {
       id: 1,
-      name: "Test Product",
+      product_name: "Test Product",
       price: 100000,
       stock_quantity: 10,
       image_url: "https://example.com/image.jpg",
