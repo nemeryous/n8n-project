@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { Link } from "react-router-dom";
 import {
   useGetOrdersQuery,
   useUpdateOrderStatusMutation,
@@ -12,6 +13,8 @@ import {
   faCheckCircle,
   faTruck,
   faBan,
+  faArrowLeft,
+  faHome,
 } from "@fortawesome/free-solid-svg-icons";
 import { AnimatePresence } from "framer-motion";
 import OrderDetailModal from "../components/OrderDetailModal";
@@ -155,9 +158,49 @@ const OrderAdminPage = () => {
   return (
     <>
       <div className="p-8 bg-gray-50 min-h-full">
-        <h1 className="text-3xl font-bold text-gray-800 mb-8">
-          Quản lý Đơn hàng
-        </h1>
+        {/* Breadcrumb Navigation */}
+        <div className="mb-6">
+          <nav className="flex items-center space-x-2 text-sm text-gray-600">
+            <Link
+              to="/"
+              className="hover:text-indigo-600 transition-colors flex items-center"
+            >
+              <FontAwesomeIcon icon={faHome} className="mr-1" />
+              Trang chủ
+            </Link>
+            <span>/</span>
+            <Link
+              to="/admin"
+              className="hover:text-indigo-600 transition-colors"
+            >
+              Quản trị
+            </Link>
+            <span>/</span>
+            <span className="text-gray-800 font-semibold">
+              Quản lý Đơn hàng
+            </span>
+          </nav>
+        </div>
+
+        {/* Header with back button */}
+        <div className="mb-8">
+          <div className="flex items-center space-x-4 mb-4">
+            <Link to="/admin">
+              <motion.button
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+                className="flex items-center space-x-2 px-4 py-2 rounded-lg bg-white text-gray-700 hover:bg-gray-100 shadow-md transition-colors"
+              >
+                <FontAwesomeIcon icon={faArrowLeft} />
+                <span>Quay lại</span>
+              </motion.button>
+            </Link>
+          </div>
+          <h1 className="text-3xl font-bold text-gray-800 mb-2">
+            Quản lý Đơn hàng
+          </h1>
+          <p className="text-gray-600">Xem và cập nhật trạng thái đơn hàng</p>
+        </div>
 
         <div className="mb-6">
           <div className="flex space-x-2 border-b-2 border-gray-200">

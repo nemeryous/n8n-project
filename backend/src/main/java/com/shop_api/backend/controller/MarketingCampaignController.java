@@ -3,6 +3,7 @@ package com.shop_api.backend.controller;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import com.shop_api.backend.dto.CreateMarketingCampaignDto;
@@ -52,12 +53,14 @@ public class MarketingCampaignController {
     }
 
     @PostMapping
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<MarketingCampaignDto> createCampaign(@RequestBody CreateMarketingCampaignDto dto) {
         MarketingCampaignDto createdCampaign = marketingCampaignService.createCampaign(dto);
         return ResponseEntity.status(HttpStatus.CREATED).body(createdCampaign);
     }
 
     @PutMapping("/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<MarketingCampaignDto> updateCampaign(
             @PathVariable Integer id,
             @RequestBody UpdateMarketingCampaignDto dto) {
@@ -70,6 +73,7 @@ public class MarketingCampaignController {
     }
 
     @DeleteMapping("/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<Void> deleteCampaign(@PathVariable Integer id) {
         boolean deleted = marketingCampaignService.deleteCampaign(id);
         return deleted ? ResponseEntity.noContent().build() : ResponseEntity.notFound().build();

@@ -1,6 +1,7 @@
 import React from "react";
 import { motion } from "framer-motion";
 import { Link } from "react-router-dom";
+import { useSelector } from "react-redux";
 import Header from "../components/layout/Header";
 import HeroBanner from "../components/HeroBanner";
 import FeaturesSection from "../components/FeaturesSection";
@@ -16,14 +17,17 @@ import {
 } from "@fortawesome/free-solid-svg-icons";
 
 export default function HomePage() {
+  const { user } = useSelector((state) => state.auth);
   const {
     data: productData,
     error,
     isLoading,
   } = useGetProductsQuery({ size: 6 }); // Lấy 6 sản phẩm nổi bật
   const [createCartItem] = useCreateCartItemMutation();
-  const customerId = 1; // Giả sử, sẽ lấy từ state auth
-  const { data: cart } = useGetOrCreateCartByCustomerQuery(customerId);
+  const customerId = user?.id || null;
+  const { data: cart } = useGetOrCreateCartByCustomerQuery(customerId, {
+    skip: !customerId,
+  });
 
   const handleAddToCart = async (product) => {
     if (!cart) {

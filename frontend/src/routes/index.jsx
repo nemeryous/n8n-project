@@ -11,6 +11,7 @@ import LoginPage from "../pages/LoginPage";
 import RegisterPage from "../pages/RegisterPage";
 import ProductAdminPage from "../pages/ProductAdminPage";
 import OrderAdminPage from "../pages/OrderAdminPage";
+import CustomerAdminPage from "../pages/CustomerAdminPage";
 
 const router = createBrowserRouter([
   {
@@ -40,6 +41,10 @@ const router = createBrowserRouter([
       {
         path: "/admin/orders",
         element: <OrderAdminPage />,
+      },
+      {
+        path: "/admin/users",
+        element: <CustomerAdminPage />,
       },
       {
         path: "/products",

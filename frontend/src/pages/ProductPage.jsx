@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { motion } from "framer-motion";
+import { useSelector } from "react-redux";
 import Header from "../components/layout/Header";
 import Footer from "../components/layout/Footer";
 import ProductCard from "../components/ProductCard";
@@ -16,6 +17,7 @@ import { useGetOrCreateCartByCustomerQuery } from "../app/cartApi";
 import { Link } from "react-router-dom";
 
 const ProductPage = () => {
+  const { user } = useSelector((state) => state.auth);
   const [search, setSearch] = useState("");
   const {
     data: productData,
@@ -23,8 +25,10 @@ const ProductPage = () => {
     isLoading,
   } = useGetProductsQuery({ search });
   const [createCartItem] = useCreateCartItemMutation();
-  const customerId = 1; // Giả sử, sẽ lấy từ state auth
-  const { data: cart } = useGetOrCreateCartByCustomerQuery(customerId);
+  const customerId = user?.id || null;
+  const { data: cart } = useGetOrCreateCartByCustomerQuery(customerId, {
+    skip: !customerId,
+  });
 
   const handleAddToCart = async (product) => {
     if (!cart) {
