@@ -1,10 +1,11 @@
 package com.shop_api.backend.dto;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-
 import lombok.Data;
 
-
+/**
+ * DTO cho checkout request
+ */
 @Data
 public class CheckoutRequestDto {
 
@@ -22,4 +23,7 @@ public class CheckoutRequestDto {
 
     @JsonProperty("notes")
     private String notes;
+
+    @JsonProperty("coupon_code")
+    private String couponCode;
 }

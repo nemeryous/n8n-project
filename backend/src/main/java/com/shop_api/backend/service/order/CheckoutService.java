@@ -20,6 +20,7 @@ import com.shop_api.backend.repository.CartRepository;
 import com.shop_api.backend.repository.OrderItemRepository;
 import com.shop_api.backend.repository.OrderRepository;
 import com.shop_api.backend.repository.ProductRepository;
+import com.shop_api.backend.service.coupon.CouponService;
 import com.shop_api.backend.service.n8n.N8nWebHookService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -46,13 +47,16 @@ public class CheckoutService {
     @Autowired
     private ProductRepository productRepository;
 
+    @Autowired
+    private CouponService couponService;
+
     /**
-     * Create order from cart - main checkout process
+     * Create order from cart - main checkout process Tích hợp coupon validation và áp dụng discount
      */
     public Order createOrderFromCart(Integer customerId, Integer cartId, String shippingAddress,
-            String phoneNumber, String notes) {
+            String phoneNumber, String notes, String couponCode) {
         // Find active cart
-        Cart cart = cartRepository.findById(cartId)
+        final Cart cart = cartRepository.findById(cartId)
                 .orElseThrow(() -> new ResourceNotFoundException("Giỏ hàng", "id", cartId));
 
         if (!cart.getCustomerId().equals(customerId)) {
@@ -64,16 +68,41 @@ public class CheckoutService {
         }
 
         // Get cart items by cart_id (updated relationship)
-        List<CartItem> cartItems = cartItemRepository.findByCartId(cartId);
+        final List<CartItem> cartItems = cartItemRepository.findByCartId(cartId);
         if (cartItems.isEmpty()) {
             throw new BadRequestException("Giỏ hàng trống");
         }
 
-        // Calculate total amount
+        // Calculate total amount before discount
         BigDecimal totalAmount = calculateTotalAmount(cartItems);
 
+        // Get product IDs and categories for coupon validation
+        final List<Integer> productIds =
+                cartItems.stream().map(CartItem::getProductId).collect(Collectors.toList());
+
+        final List<String> categories = cartItems.stream().map(cartItem -> {
+            final Product product =
+                    productRepository.findById(cartItem.getProductId()).orElse(null);
+            return product != null ? product.getCategory() : null;
+        }).filter(category -> category != null).distinct().collect(Collectors.toList());
+
+        // Validate and apply coupon if provided
+        Integer appliedCouponId = null;
+        if (couponCode != null && !couponCode.trim().isEmpty()) {
+            final var validation = couponService.validateCoupon(couponCode, customerId, totalAmount,
+                    productIds, categories);
+
+            if (validation.getIsValid()) {
+                // Apply discount
+                totalAmount = validation.getFinalAmount();
+                appliedCouponId = couponService.getCouponByCode(couponCode).getId();
+            } else {
+                throw new BadRequestException(validation.getMessage());
+            }
+        }
+
         // Create order
-        Order order = new Order();
+        final Order order = new Order();
         order.setCustomerId(customerId);
         order.setCartId(cartId);
         order.setOrderDate(Instant.now());
@@ -85,10 +114,15 @@ public class CheckoutService {
         order.setCreatedAt(Instant.now());
         order.setUpdatedAt(Instant.now());
 
-        Order savedOrder = orderRepository.save(order);
+        final Order savedOrder = orderRepository.save(order);
 
         // Create order items
         createOrderItems(savedOrder.getId(), cartItems);
+
+        // Apply coupon (increment usage count) after order is created successfully
+        if (appliedCouponId != null) {
+            couponService.applyCoupon(appliedCouponId);
+        }
 
         // Update cart status to COMPLETED
         cart.setStatus(CartStatus.COMPLETED);
