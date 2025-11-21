@@ -9,6 +9,7 @@ import com.shop_api.backend.entity.Product;
 import com.shop_api.backend.repository.ProductRepository;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.CommandLineRunner;
+import org.springframework.context.annotation.Profile;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 import lombok.RequiredArgsConstructor;
@@ -21,6 +22,7 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 @Component
 @Order(1)
+@Profile("!test")
 @RequiredArgsConstructor
 public class ProductSeeder implements CommandLineRunner {
 
