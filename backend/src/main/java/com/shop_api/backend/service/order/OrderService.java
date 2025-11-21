@@ -7,7 +7,7 @@ import com.shop_api.backend.entity.OrderItem;
 
 public interface OrderService {
     Order createOrderFromCart(Integer customerId, Integer cartId, String shippingAddress,
-            String phoneNumber, String notes);
+            String phoneNumber, String notes, String couponCode);
 
     Order getOrderById(Integer orderId);
 

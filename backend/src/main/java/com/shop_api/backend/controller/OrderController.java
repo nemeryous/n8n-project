@@ -43,14 +43,14 @@ public class OrderController {
             Integer customerId = request.getCustomerId();
             if (customerId == null) {
                 customerId = userPrincipal.getId();
-            } else if (!customerId.equals(userPrincipal.getId())
-                    && !userPrincipal.getAuthorities().stream()
-                            .anyMatch(a -> a.getAuthority().equals("ROLE_ADMIN"))) {
+            } else if (!customerId.equals(userPrincipal.getId()) && !userPrincipal.getAuthorities()
+                    .stream().anyMatch(a -> a.getAuthority().equals("ROLE_ADMIN"))) {
                 return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
             }
 
             Order order = orderService.createOrderFromCart(customerId, request.getCartId(),
-                    request.getShippingAddress(), request.getPhoneNumber(), request.getNotes());
+                    request.getShippingAddress(), request.getPhoneNumber(), request.getNotes(),
+                    request.getCouponCode());
 
             n8nWebHookService.triggerOrderCompletedWebhook(OrderDto.fromEntity(order));
             return ResponseEntity.status(HttpStatus.CREATED).body(OrderDto.fromEntity(order));
@@ -65,7 +65,8 @@ public class OrderController {
         try {
             Order order = orderService.getOrderById(orderId);
             // Check if user owns the order or is admin
-            if (order.getCustomerId() != null && !order.getCustomerId().equals(userPrincipal.getId())
+            if (order.getCustomerId() != null
+                    && !order.getCustomerId().equals(userPrincipal.getId())
                     && !userPrincipal.getAuthorities().stream()
                             .anyMatch(a -> a.getAuthority().equals("ROLE_ADMIN"))) {
                 return ResponseEntity.status(HttpStatus.FORBIDDEN).build();

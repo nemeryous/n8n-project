@@ -43,14 +43,14 @@ public class CheckoutController {
             Integer customerId = request.getCustomerId();
             if (customerId == null) {
                 customerId = userPrincipal.getId();
-            } else if (!customerId.equals(userPrincipal.getId())
-                    && !userPrincipal.getAuthorities().stream()
-                            .anyMatch(a -> a.getAuthority().equals("ROLE_ADMIN"))) {
+            } else if (!customerId.equals(userPrincipal.getId()) && !userPrincipal.getAuthorities()
+                    .stream().anyMatch(a -> a.getAuthority().equals("ROLE_ADMIN"))) {
                 return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
             }
 
             Order order = checkoutService.createOrderFromCart(customerId, request.getCartId(),
-                    request.getShippingAddress(), request.getPhoneNumber(), request.getNotes());
+                    request.getShippingAddress(), request.getPhoneNumber(), request.getNotes(),
+                    request.getCouponCode());
 
             return ResponseEntity.status(HttpStatus.CREATED).body(OrderDto.fromEntity(order));
         } catch (RuntimeException e) {
@@ -64,7 +64,8 @@ public class CheckoutController {
         try {
             Order order = checkoutService.getOrderById(orderId);
             // Check if user owns the order or is admin
-            if (order.getCustomerId() != null && !order.getCustomerId().equals(userPrincipal.getId())
+            if (order.getCustomerId() != null
+                    && !order.getCustomerId().equals(userPrincipal.getId())
                     && !userPrincipal.getAuthorities().stream()
                             .anyMatch(a -> a.getAuthority().equals("ROLE_ADMIN"))) {
                 return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
@@ -109,7 +110,8 @@ public class CheckoutController {
     public ResponseEntity<OrderDto> updateOrderStatus(@PathVariable Integer orderId,
             @RequestBody OrderStatusUpdateDto statusUpdate) {
         try {
-            Order updatedOrder = checkoutService.updateOrderStatus(orderId, statusUpdate.getStatus());
+            Order updatedOrder =
+                    checkoutService.updateOrderStatus(orderId, statusUpdate.getStatus());
 
             OrderDto orderDto = OrderDto.fromEntity(updatedOrder);
             if (orderDto.getStatus() == OrderStatus.PROCESSING) {
