@@ -12,6 +12,7 @@ import RegisterPage from "../pages/RegisterPage";
 import ProductAdminPage from "../pages/ProductAdminPage";
 import OrderAdminPage from "../pages/OrderAdminPage";
 import CustomerAdminPage from "../pages/CustomerAdminPage";
+import CouponAdminPage from "../pages/CouponAdminPage";
 import ProtectedRoute from "../components/ProtectedRoute";
 
 const router = createBrowserRouter([
@@ -60,6 +61,14 @@ const router = createBrowserRouter([
         element: (
           <ProtectedRoute requiredRole="ADMIN">
             <CustomerAdminPage />
+          </ProtectedRoute>
+        ),
+      },
+      {
+        path: "/admin/coupons",
+        element: (
+          <ProtectedRoute requiredRole="ADMIN">
+            <CouponAdminPage />
           </ProtectedRoute>
         ),
       },

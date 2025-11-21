@@ -35,19 +35,19 @@ const OrderDetailModal = ({ order, onClose }) => {
     }
     return (
       <ul className="space-y-3 max-h-60 overflow-y-auto pr-2">
-        {items?.map((item) => (
+        {items?.map((item, index) => (
           <li
-            key={item.product_id}
+            key={item.productId || index}
             className="flex justify-between items-center bg-gray-50 p-3 rounded-lg"
           >
             <div>
-              <p className="font-semibold">{item.product_name}</p>
+              <p className="font-semibold">{item.productName}</p>
               <p className="text-sm text-gray-500">
-                {item.quantity} x {item.unit_price.toLocaleString("vi-VN")}đ
+                {item.quantity} x {item.unitPrice.toLocaleString("vi-VN")}đ
               </p>
             </div>
             <p className="font-semibold">
-              {item.total_price.toLocaleString("vi-VN")}đ
+              {item.totalPrice.toLocaleString("vi-VN")}đ
             </p>
           </li>
         ))}
@@ -86,27 +86,27 @@ const OrderDetailModal = ({ order, onClose }) => {
           <div className="grid grid-cols-2 gap-4">
             <p>
               <strong>Ngày đặt:</strong>{" "}
-              {new Date(order.order_date).toLocaleString("vi-VN")}
+              {new Date(order.orderDate).toLocaleString("vi-VN")}
             </p>
             <p>
               <strong>Trạng thái:</strong> {order.status}
             </p>
             <p>
-              <strong>Mã khách hàng:</strong> {order.customer_id}
+              <strong>Mã khách hàng:</strong> {order.customerId}
             </p>
             <p>
               <strong>Tổng tiền:</strong>{" "}
               <span className="font-bold text-indigo-600">
-                {order.total_amount.toLocaleString("vi-VN")}đ
+                {order.totalAmount.toLocaleString("vi-VN")}đ
               </span>
             </p>
           </div>
           <div>
             <p>
-              <strong>Địa chỉ giao hàng:</strong> {order.shipping_address}
+              <strong>Địa chỉ giao hàng:</strong> {order.shippingAddress}
             </p>
             <p>
-              <strong>Số điện thoại:</strong> {order.phone_number}
+              <strong>Số điện thoại:</strong> {order.phoneNumber}
             </p>
             {order.notes && (
               <p>

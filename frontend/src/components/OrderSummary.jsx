@@ -4,14 +4,23 @@ import {
   faShoppingCart,
   faTruck,
   faShieldAlt,
+  faTag,
 } from "@fortawesome/free-solid-svg-icons";
 
-const OrderSummary = ({ cartItems, shippingFee }) => {
+const OrderSummary = ({
+  cartItems,
+  shippingFee,
+  discountAmount = 0,
+  couponCode = null,
+}) => {
   const subtotal = cartItems.reduce(
-    (sum, item) => (item ? sum + item.unit_price * item.quantity : sum),
+    (sum, item) =>
+      item
+        ? sum + (item.product?.price || item.unit_price || 0) * item.quantity
+        : sum,
     0,
   );
-  const total = subtotal + shippingFee;
+  const total = subtotal + shippingFee - discountAmount;
 
   const validItemsCount = cartItems.filter((item) => item).length;
 
@@ -46,6 +55,18 @@ const OrderSummary = ({ cartItems, shippingFee }) => {
             {shippingFee.toLocaleString("vi-VN")}đ
           </span>
         </div>
+
+        {discountAmount > 0 && (
+          <div className="flex justify-between text-green-600">
+            <span className="flex items-center">
+              <FontAwesomeIcon icon={faTag} className="mr-2 text-green-600" />
+              Giảm giá {couponCode && `(${couponCode})`}
+            </span>
+            <span className="font-semibold">
+              -{discountAmount.toLocaleString("vi-VN")}đ
+            </span>
+          </div>
+        )}
 
         <div className="border-t-2 border-indigo-200 pt-4">
           <div className="flex justify-between items-center">

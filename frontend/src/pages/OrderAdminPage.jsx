@@ -107,12 +107,12 @@ const OrderAdminPage = () => {
         <td className="p-4 border-b border-gray-200 font-mono text-gray-700">
           #{order.id}
         </td>
-        <td className="p-4 border-b border-gray-200">{order.customer_id}</td>
+        <td className="p-4 border-b border-gray-200">{order.customerId}</td>
         <td className="p-4 border-b border-gray-200">
-          {new Date(order.order_date).toLocaleDateString("vi-VN")}
+          {new Date(order.orderDate).toLocaleDateString("vi-VN")}
         </td>
         <td className="p-4 border-b border-gray-200 font-semibold">
-          {order.total_amount.toLocaleString("vi-VN")}đ
+          {order.totalAmount.toLocaleString("vi-VN")}đ
         </td>
         <td className="p-4 border-b border-gray-200">
           <span

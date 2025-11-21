@@ -7,6 +7,7 @@ import {
   faUsers,
   faArrowLeft,
   faHome,
+  faTag,
 } from "@fortawesome/free-solid-svg-icons";
 import { Link } from "react-router-dom";
 
@@ -68,7 +69,7 @@ const AdminPage = () => {
       </header>
 
       <main className="max-w-4xl mx-auto">
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
           <NavLink
             to="/admin/products"
             icon={faTshirt}
@@ -86,6 +87,12 @@ const AdminPage = () => {
             icon={faUsers}
             title="Quản lý Người dùng"
             subtitle="Quản lý tài khoản"
+          />
+          <NavLink
+            to="/admin/coupons"
+            icon={faTag}
+            title="Quản lý Coupon"
+            subtitle="Quản lý mã giảm giá"
           />
         </div>
       </main>

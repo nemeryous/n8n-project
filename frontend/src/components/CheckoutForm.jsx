@@ -1,10 +1,13 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+import { useSelector } from "react-redux";
 import { motion } from "framer-motion";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faCheckCircle } from "@fortawesome/free-solid-svg-icons";
 import InputField from "./ui/InputField";
 
 const CheckoutForm = ({ onSubmit, isProcessing }) => {
+  const { user } = useSelector((state) => state.auth);
+
   const [formData, setFormData] = useState({
     fullName: "",
     email: "",
@@ -12,6 +15,19 @@ const CheckoutForm = ({ onSubmit, isProcessing }) => {
     address: "",
     notes: "",
   });
+
+  // Auto-fill form with user data if available
+  useEffect(() => {
+    if (user) {
+      setFormData((prev) => ({
+        fullName: prev.fullName || user.name || user.fullName || "",
+        email: prev.email || user.email || "",
+        phone: prev.phone || user.phone || user.phoneNumber || "",
+        address: prev.address || user.address || "",
+        notes: prev.notes || "",
+      }));
+    }
+  }, [user]);
 
   const [errors, setErrors] = useState({});
 

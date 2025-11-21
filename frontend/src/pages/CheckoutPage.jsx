@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useSelector } from "react-redux";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
@@ -12,6 +12,7 @@ import Header from "../components/layout/Header";
 import CartItem from "../components/CartItem";
 import OrderSummary from "../components/OrderSummary";
 import CheckoutForm from "../components/CheckoutForm";
+import CouponInput from "../components/checkout/CouponInput";
 import { Link, useNavigate } from "react-router-dom";
 import {
   useGetCartItemsByCustomerIdQuery,
@@ -41,8 +42,27 @@ export default function CheckoutPage() {
   const [updateCartItem] = useUpdateCartItemMutation();
   const [deleteCartItem] = useDeleteCartItemMutation();
   const [createOrder, { isLoading: isProcessing }] = useCreateOrderMutation();
+  const [appliedCoupon, setAppliedCoupon] = useState(null);
 
   const navigate = useNavigate();
+
+  // Calculate subtotal
+  const subtotal = cartItems.reduce((sum, item) => {
+    const price = item.unit_price || item.product?.price || 0;
+    const quantity = item.quantity || 0;
+    return sum + price * quantity;
+  }, 0);
+
+  // Debug log to verify subtotal calculation
+  if (cartItems.length > 0) {
+    console.log("CheckoutPage - Subtotal calculation:", {
+      cartItemsCount: cartItems.length,
+      subtotal: subtotal,
+      sampleItem: cartItems[0],
+      sampleItemPrice: cartItems[0]?.unit_price || cartItems[0]?.product?.price,
+      sampleItemQuantity: cartItems[0]?.quantity,
+    });
+  }
 
   const handleUpdateQuantity = async (itemId, newQuantity) => {
     if (newQuantity < 1) return;
@@ -61,38 +81,56 @@ export default function CheckoutPage() {
     }
   };
 
+  const handleCouponApplied = (couponData) => {
+    setAppliedCoupon(couponData);
+  };
+
+  const handleCouponRemoved = () => {
+    setAppliedCoupon(null);
+  };
+
   const handleCheckout = async (formData) => {
     if (!cart || !cartItems.length) return;
+
+    // Build notes: combine user notes with coupon info if available
+    let notes = formData.notes || "";
+    if (appliedCoupon) {
+      notes = notes
+        ? `${notes} | Coupon: ${appliedCoupon.code}`
+        : `Coupon: ${appliedCoupon.code}`;
+    }
 
     const orderPayload = {
       customer_id: customerId,
       cart_id: cart.id,
       shipping_address: formData.address,
       phone_number: formData.phone,
-      notes: `Customer name: ${formData.name}`,
+      notes: notes || null,
+      ...(appliedCoupon && { coupon_code: appliedCoupon.code }),
     };
 
     try {
       const result = await createOrder(orderPayload).unwrap();
 
-      const subtotal = cartItems.reduce(
-        (sum, item) => sum + item.product.price * item.quantity,
-        0,
-      );
-      const total = subtotal + SHIPPING_FEE;
+      const discountAmount = appliedCoupon?.discountAmount || 0;
+      const total = subtotal + SHIPPING_FEE - discountAmount;
 
       const finalOrderData = {
         ...result,
-        total_amount: total,
-        customer_name: formData.name,
-        shipping_address: formData.address,
-        customer_email: formData.email,
+        totalAmount: total,
+        customerName: formData.fullName,
+        shippingAddress: formData.address,
+        customerEmail: formData.email,
         items: cartItems.map((ci) => ({
+          name: ci.product_name || ci.product?.name || ci.product?.product_name,
+          price: ci.unit_price || ci.product?.price || 0,
+          quantity: ci.quantity || 0,
           ...ci.product,
-          quantity: ci.quantity,
         })),
         shippingFee: SHIPPING_FEE,
         subtotal: subtotal,
+        discountAmount: discountAmount,
+        coupon: appliedCoupon,
       };
 
       navigate("/confirmation", { state: { orderData: finalOrderData } });
@@ -210,6 +248,9 @@ export default function CheckoutPage() {
                 animate={{ opacity: 1, x: 0, transition: { delay: 0.1 } }}
                 className="bg-white rounded-xl shadow-lg p-8"
               >
+                <h2 className="text-2xl font-bold text-gray-800 mb-6">
+                  Thông tin thanh toán
+                </h2>
                 <CheckoutForm
                   onSubmit={handleCheckout}
                   isProcessing={isProcessing}
@@ -221,9 +262,26 @@ export default function CheckoutPage() {
             <motion.div
               initial={{ opacity: 0, x: 20 }}
               animate={{ opacity: 1, x: 0, transition: { delay: 0.2 } }}
-              className="h-fit sticky top-8"
+              className="h-fit sticky top-8 space-y-6"
             >
-              <OrderSummary cartItems={cartItems} shippingFee={SHIPPING_FEE} />
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                className="bg-white rounded-xl shadow-lg p-6"
+              >
+                <CouponInput
+                  onCouponApplied={handleCouponApplied}
+                  onCouponRemoved={handleCouponRemoved}
+                  appliedCoupon={appliedCoupon}
+                  subtotal={subtotal}
+                />
+              </motion.div>
+              <OrderSummary
+                cartItems={cartItems}
+                shippingFee={SHIPPING_FEE}
+                discountAmount={appliedCoupon?.discountAmount || 0}
+                couponCode={appliedCoupon?.code}
+              />
             </motion.div>
           </motion.div>
         )}

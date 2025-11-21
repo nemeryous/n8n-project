@@ -78,24 +78,24 @@ const ConfirmationPage = () => {
             <OrderDetailCard
               icon={faIdCard}
               label="Mã đơn hàng"
-              value={orderData.order_id}
+              value={orderData.id || orderData.orderId}
               highlight
             />
             <OrderDetailCard
               icon={faMoneyBillWave}
               label="Tổng thanh toán"
-              value={`${orderData.total_amount.toLocaleString("vi-VN")}đ`}
+              value={`${(orderData.totalAmount || 0).toLocaleString("vi-VN")}đ`}
               highlight
             />
             <OrderDetailCard
               icon={faTruck}
               label="Khách hàng"
-              value={orderData.customer_name}
+              value={orderData.customerName}
             />
             <OrderDetailCard
               icon={faMapMarkerAlt}
               label="Địa chỉ giao hàng"
-              value={orderData.shipping_address}
+              value={orderData.shippingAddress}
             />
           </motion.div>
 

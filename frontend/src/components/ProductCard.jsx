@@ -43,7 +43,7 @@ const ProductCard = ({ product, onAddToCart }) => {
       <div className="relative h-72 overflow-hidden bg-gray-100">
         <motion.img
           src={product.image_url}
-          alt={product.name}
+          alt={product.product_name}
           animate={{ scale: isHovered ? 1.1 : 1 }}
           transition={{ duration: 0.4 }}
           className="w-full h-full object-cover"
@@ -95,7 +95,7 @@ const ProductCard = ({ product, onAddToCart }) => {
       {/* Product Info */}
       <div className="p-6">
         <h3 className="text-lg font-bold text-gray-800 mb-2 line-clamp-2 h-14">
-          {product.name}
+          {product.product_name}
         </h3>
 
         <div className="flex items-center mb-3 h-5">
