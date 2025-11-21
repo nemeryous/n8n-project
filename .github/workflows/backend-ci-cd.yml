@@ -43,7 +43,7 @@ jobs:
   # ========================================================
   build:
     name: 🏗 Build Project
-    needs: quality # Chỉ chạy khi Job 'quality' thành công
+    needs: quality
     runs-on: ubuntu-latest
     if: github.ref == 'refs/heads/main'
     defaults:
@@ -63,10 +63,8 @@ jobs:
       - name: 🏗️ Build Package
         run: |
           mvn clean package -DskipTests
-          # Project build ra file .war, đổi tên thành app.jar để dễ deploy
           mv target/*.war target/app.jar
 
-      # Quan trọng: Lưu file JAR/WAR lại để chuyển sang Job Deploy
       - name: 💾 Upload Artifact
         uses: actions/upload-artifact@v4
         with:
@@ -79,11 +77,10 @@ jobs:
   # ========================================================
   deploy:
     name: 🚀 Deploy to VPS
-    needs: build # Chỉ chạy khi Job 'build' thành công
+    needs: build
     runs-on: ubuntu-latest
     if: github.ref == 'refs/heads/main'
     steps:
-      # Tải file JAR từ Job 'build' về
       - name: 💾 Download Artifact
         uses: actions/download-artifact@v4
         with:
@@ -99,8 +96,9 @@ jobs:
           source: "target/app.jar"
           target: "/home/${{ secrets.VPS_USER }}/backend"
           strip_components: 1
+          rm: true # Xóa file cũ trước khi copy để tránh rác
 
-      - name: 🔄 Restart Service
+      - name: 🚀 Restart & Health Check
         uses: appleboy/ssh-action@master
         with:
           host: ${{ secrets.VPS_HOST }}
@@ -108,16 +106,32 @@ jobs:
           key: ${{ secrets.VPS_SSH_KEY }}
           script: |
             echo "🔄 Restarting Spring Boot Service..."
-            # Sử dụng sudo -n (non-interactive) - yêu cầu đã cấu hình sudoers
+            # Restart service
             sudo -n systemctl restart springboot-app.service || {
-              echo "❌ Error: Cannot restart service without password"
-              echo "📝 Please configure sudoers on VPS:"
-              echo "   1. SSH to VPS: ssh ${{ secrets.VPS_USER }}@${{ secrets.VPS_HOST }}"
-              echo "   2. Run: sudo visudo"
-              echo "   3. Add line: ${{ secrets.VPS_USER }} ALL=(ALL) NOPASSWD: /bin/systemctl restart springboot-app.service, /bin/systemctl status springboot-app.service"
-              exit 1
+               echo "❌ Failed to execute restart command"
+               exit 1
             }
-            sleep 5
-            echo "✅ Checking service status..."
-            sudo -n systemctl status springboot-app.service --no-pager || true
-            echo "✅ Deployment completed successfully!"
+            
+            echo "⏳ Waiting for application to start (45s)..."
+            # Spring Boot cần thời gian khởi động, chờ 45s
+            sleep 45
+            
+            echo "🏥 Performing Health Check..."
+            # Gọi vào API health check (hoặc root /). 
+            # -s: Silent, -f: Fail on HTTP error, -o /dev/null: Bỏ qua output body
+            # Nếu app lỗi (DB connection fail...), port 8080 sẽ không mở -> curl thất bại
+            if curl -s -f -o /dev/null http://localhost:8080/actuator/health; then
+              echo "✅ Health Check Passed! Application is running."
+              exit 0
+            else
+              echo "❌ Health Check FAILED! Application is NOT responding."
+              
+              echo "📋 Fetching recent error logs (Last 50 lines)..."
+              echo "----------------------------------------"
+              # In log ra màn hình CI/CD để debug ngay lập tức
+              sudo -n journalctl -u springboot-app.service -n 50 --no-pager
+              echo "----------------------------------------"
+              
+              # Quan trọng: exit 1 để GitHub Actions đánh dấu job là Failed
+              exit 1
+            fi
