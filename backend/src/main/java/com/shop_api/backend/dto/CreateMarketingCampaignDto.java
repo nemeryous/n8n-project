@@ -1,6 +1,7 @@
 package com.shop_api.backend.dto;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.shop_api.backend.entity.MarketingCampaign;
 import lombok.Data;
 
@@ -23,7 +24,7 @@ public class CreateMarketingCampaignDto {
     private String launchPost;
 
     @JsonProperty("faqAnswers")
-    private String faqAnswers;
+    private Object faqAnswers;
 
     @JsonProperty("teaserPostId")
     private String teaserPostId;
@@ -38,7 +39,13 @@ public class CreateMarketingCampaignDto {
         campaign.setImageUrl(dto.getImageUrl());
         campaign.setTeaserPost(dto.getTeaserPost());
         campaign.setLaunchPost(dto.getLaunchPost());
-        campaign.setFaqAnswers(dto.getFaqAnswers());
+        
+        try {
+            campaign.setFaqAnswers(new ObjectMapper().writeValueAsString(dto.getFaqAnswers()));
+        } catch (Exception e) {
+            campaign.setFaqAnswers("{}");
+        }
+
         campaign.setTeaserPostId(dto.getTeaserPostId());
         campaign.setLaunchPostId(dto.getLaunchPostId());
         return campaign;
