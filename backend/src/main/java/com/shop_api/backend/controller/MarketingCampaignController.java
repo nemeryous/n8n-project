@@ -78,12 +78,10 @@ public class MarketingCampaignController {
     public ResponseEntity<MarketingCampaignDto> updateCampaignPostIds(
             @PathVariable Integer id,
             @RequestBody UpdateCampaignPostIdsDto dto) {
-        try {
-            MarketingCampaignDto updatedCampaign = marketingCampaignService.updateCampaignPostIds(id, dto);
-            return ResponseEntity.ok(updatedCampaign);
-        } catch (RuntimeException e) {
-            return ResponseEntity.notFound().build();
-        }
+
+        MarketingCampaignDto updatedCampaign = marketingCampaignService.updateCampaignPostIds(id, dto);
+        return ResponseEntity.ok(updatedCampaign);
+
     }
 
     @DeleteMapping("/{id}")
