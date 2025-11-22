@@ -2,6 +2,7 @@ package com.shop_api.backend.config;
 
 import java.util.Arrays;
 import java.util.List;
+import com.shop_api.backend.security.ApiKeyAuthenticationFilter;
 import com.shop_api.backend.security.CustomUserDetailsService;
 import com.shop_api.backend.security.JwtAuthenticationEntryPoint;
 import com.shop_api.backend.security.JwtAuthenticationFilter;
@@ -38,6 +39,7 @@ public class SecurityConfig {
     private final CustomUserDetailsService userDetailsService;
     private final JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint;
     private final JwtAuthenticationFilter jwtAuthenticationFilter;
+    private final ApiKeyAuthenticationFilter apiKeyAuthenticationFilter;
 
     /**
      * Password encoder bean using BCrypt
@@ -116,6 +118,10 @@ public class SecurityConfig {
 
                 // Configure authentication provider
                 .authenticationProvider(authenticationProvider())
+
+                // Add API Key authentication filter
+                .addFilterBefore(apiKeyAuthenticationFilter,
+                        UsernamePasswordAuthenticationFilter.class)
 
                 // Add JWT authentication filter
                 .addFilterBefore(jwtAuthenticationFilter,
