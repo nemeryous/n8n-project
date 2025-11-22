@@ -5,6 +5,7 @@ import org.springframework.stereotype.Service;
 
 import com.shop_api.backend.dto.CreateMarketingCampaignDto;
 import com.shop_api.backend.dto.MarketingCampaignDto;
+import com.shop_api.backend.dto.UpdateCampaignPostIdsDto;
 import com.shop_api.backend.dto.UpdateMarketingCampaignDto;
 import com.shop_api.backend.entity.MarketingCampaign;
 import com.shop_api.backend.repository.MarketingCampaignRepository;
@@ -71,6 +72,22 @@ public class MarketingCampaignServiceImpl implements MarketingCampaignService {
         if (dto.getFaqAnswers() != null) {
             campaign.setFaqAnswers(dto.getFaqAnswers());
         }
+        if (dto.getTeaserPostId() != null) {
+            campaign.setTeaserPostId(dto.getTeaserPostId());
+        }
+        if (dto.getLaunchPostId() != null) {
+            campaign.setLaunchPostId(dto.getLaunchPostId());
+        }
+
+        MarketingCampaign updatedCampaign = marketingCampaignRepository.save(campaign);
+        return MarketingCampaignDto.fromEntity(updatedCampaign);
+    }
+
+    @Override
+    public MarketingCampaignDto updateCampaignPostIds(Integer id, UpdateCampaignPostIdsDto dto) {
+        MarketingCampaign campaign = marketingCampaignRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Marketing campaign not found with id: " + id));
+
         if (dto.getTeaserPostId() != null) {
             campaign.setTeaserPostId(dto.getTeaserPostId());
         }

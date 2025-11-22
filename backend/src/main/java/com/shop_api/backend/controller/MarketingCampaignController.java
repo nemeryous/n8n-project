@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.*;
 
 import com.shop_api.backend.dto.CreateMarketingCampaignDto;
 import com.shop_api.backend.dto.MarketingCampaignDto;
+import com.shop_api.backend.dto.UpdateCampaignPostIdsDto;
 import com.shop_api.backend.dto.UpdateMarketingCampaignDto;
 import com.shop_api.backend.service.marketing.MarketingCampaignService;
 
@@ -66,6 +67,19 @@ public class MarketingCampaignController {
             @RequestBody UpdateMarketingCampaignDto dto) {
         try {
             MarketingCampaignDto updatedCampaign = marketingCampaignService.updateCampaign(id, dto);
+            return ResponseEntity.ok(updatedCampaign);
+        } catch (RuntimeException e) {
+            return ResponseEntity.notFound().build();
+        }
+    }
+
+    @PatchMapping("/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<MarketingCampaignDto> updateCampaignPostIds(
+            @PathVariable Integer id,
+            @RequestBody UpdateCampaignPostIdsDto dto) {
+        try {
+            MarketingCampaignDto updatedCampaign = marketingCampaignService.updateCampaignPostIds(id, dto);
             return ResponseEntity.ok(updatedCampaign);
         } catch (RuntimeException e) {
             return ResponseEntity.notFound().build();
