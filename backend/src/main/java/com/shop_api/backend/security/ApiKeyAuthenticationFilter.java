@@ -31,7 +31,17 @@ public class ApiKeyAuthenticationFilter extends OncePerRequestFilter {
         // If API Key matches, authenticate as ADMIN
         if (apiKey != null && !apiKey.isEmpty() && apiKey.equals(requestApiKey)) {
             var authorities = Collections.singletonList(new SimpleGrantedAuthority("ROLE_ADMIN"));
-            var authentication = new UsernamePasswordAuthenticationToken("n8n-webhook", null, authorities);
+            
+            // Create a dummy UserPrincipal for n8n
+            UserPrincipal principal = new UserPrincipal(
+                0, // ID 0 for system/n8n user
+                "N8N Integration",
+                "n8n@system",
+                null,
+                authorities
+            );
+
+            var authentication = new UsernamePasswordAuthenticationToken(principal, null, authorities);
             SecurityContextHolder.getContext().setAuthentication(authentication);
         }
 
