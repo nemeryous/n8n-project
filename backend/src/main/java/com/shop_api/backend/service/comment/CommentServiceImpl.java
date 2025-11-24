@@ -6,9 +6,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.shop_api.backend.dto.CommentDto;
+import com.shop_api.backend.entity.Comment;
 import com.shop_api.backend.repository.CommentRepository;
 
+import lombok.extern.slf4j.Slf4j;
+
 @Service
+@Slf4j
 public class CommentServiceImpl implements CommentService {
 
   @Autowired
@@ -16,8 +20,12 @@ public class CommentServiceImpl implements CommentService {
 
   @Override
   public CommentDto createComment(CommentDto commentDto) {
+    log.info("Creating comment: {}", commentDto);
 
-    return CommentDto.fromEntity(commentRepository.save(CommentDto.toEntity(commentDto)));
+    Comment comment = commentRepository.save(CommentDto.toEntity(commentDto));
+    
+    log.info("Comment created successfully with ID: {}", comment);
+    return CommentDto.fromEntity(comment);
   }
 
   @Override
